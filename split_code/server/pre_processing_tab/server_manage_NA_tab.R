@@ -2,12 +2,11 @@
 #             Manage Missing Values               #
 ###################################################
 
-
 ########## Interpolate ##########
 
 # Event of clicking Interpolate
 observeEvent(input$interpolate, {
-  names = input$colNAInterpolate
+  names = input$colWithNAvalues
   method = input$interpolationMethod
   v$data = interpolateColValues(v$data, names, method)
   renderMergedDataTable(v$data)
@@ -24,15 +23,29 @@ interpolateColValues <- function(array, colNameList, method) {
 ########## Repeating ##########
 
 # Event of repeating
-observeEvent(input$repeating, {
-  names = input$colNARepeating
-  v$data = repeatingColValues(v$data, names)
+observeEvent(input$repeating1, {
+  names = input$colWithNAvalues
+  v$data = repeatingColValues1(v$data, names)
   renderMergedDataTable(v$data)
 })
 
-repeatingColValues <- function(array, colNameList) {
+repeatingColValues1 <- function(array, colNameList) {
   for (i in colNameList) {
-    array[,i] = na.locf.default(array[,i], option = "locf", na.remaining = "keep") 
-  }
+    array[,i] = na.locf(array[,i], option = "locf", na.remaining = "rev")
+    }
+  return(array)
+}
+
+# Event of repeating
+observeEvent(input$repeating2, {
+  names = input$colWithNAvalues
+  v$data = repeatingColValues2(v$data, names)
+  renderMergedDataTable(v$data)
+})
+
+repeatingColValues2 <- function(array, colNameList) {
+  for (i in colNameList) {
+    array[,i] = na.locf.default(array[,i])
+    }
   return(array)
 }

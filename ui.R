@@ -196,30 +196,62 @@ dashboardPage(
               "Manage missing values",
               fluidRow(
                 # interopolating/reapeting
-                box(width = 6, selectizeInput('colNAInterpolate', 'Interpolation',
-                                              choices = c('No info to show'),
-                                              multiple = T,
-                                              options = list(placeholder = 'select column(s)')),
-                    box(width = 8, radioButtons('interpolationMethod', 'Method',
-                                                c(Linear ='linear',
-                                                  Spline = 'spline',
-                                                  Stineman = 'stine' ),                                                  
-                                                selected = 'linear',
-                                                inline = TRUE)
+                box(width = 12, 
+                    column(6,
+                           selectizeInput(
+                             'colWithNAvalues', 'Select Target',
+                             choices = c('No info to show'),
+                             multiple = F,
+                             options = list(placeholder = 'select variable(s)')
+                             )
                     ),
-                    actionButton('interpolate', 
-                                 'Interpolate')
-                ),
-                box(
-                  width = 6,
-                  selectizeInput('colNARepeating', 
-                                 'Repeat values', 
-                                 choices = c('No info to show'), 
-                                 multiple = T,
-                                 options = list(placeholder = 'select column(s)')),
-                  column(width = 2, offset = 10, actionButton('repeating', 'Repeat'))
+                    conditionalPanel(
+                      "output.check1",
+                      column(6,
+                             selectizeInput(
+                               'theNApolicy', "The target is Numerical, Select NA's Policy",
+                               choices = c('Repeating', 'Interpolation'),
+                               multiple = F
+                             ),
+                             conditionalPanel(
+                               'input.theNApolicy == "Interpolation"',
+                               column(12, 
+                                      box(
+                                        title = 'Interpolation Methods',
+                                        width = 8, 
+                                        radioButtons('interpolationMethod', 'Method',
+                                                     c(Linear ='linear',
+                                                       Spline = 'spline',
+                                                       Stineman = 'stine' ),                                                  
+                                                     selected = 'linear',
+                                                     inline = TRUE)
+                                      ),
+                                      column(4,
+                                      actionButton('interpolate',
+                                                   'Interpolate')
+                                      )
+                                )
+                             ),
+                             conditionalPanel(
+                               'input.theNApolicy == "Repeating"',
+                               column(12, offset = 10,
+                                      actionButton('repeating1', 'Repeat')
+                               )
+                              )
+                             )
+                       ),
+                    conditionalPanel(
+                      "output.check2",
+                      column(6, 
+                             "Non-Numerical target, as a result Repeat NA's Policy should be used",
+                             column(12, offset = 4,
+                                    actionButton('repeating2', 'Repeat')
+                             )
+                      )
+                    )
+                
+                  )
                 )
-              )
             )
             # tabPanel(
             #   "Other Options",
@@ -302,24 +334,23 @@ dashboardPage(
                 )
               )
             ),
-            
+            # allow x-flow for DT:dataTable
+            shinyjs::inlineCSS(list(
+              ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+            )),
             tabPanel(
-              "Pre-Processed Data",
-              fluidRow(
-                width = 12, uiOutput("dataTable")
-              )
+              "Pre-Processed Data", uiOutput("dataTable")
             ),
             tabPanel(
-              "Summary",
-              fluidPage(
-                width = 12, verbatimTextOutput("dataSummary")
-              )
+              "Summary", verbatimTextOutput("dataSummary")
             ),
-            tabPanel(tagList(shiny::icon("download"), "Save"), 
-                     div(
-                       style="text-align:center; padding:30px",
-                       downloadButton("processedDataset", label = "Download pre-processed data table (.CSV)")
-                     )
+            tabPanel(
+              tagList(shiny::icon("download"), "Save"), 
+              div(
+                style="text-align:center; padding:30px",
+                downloadButton("processedDataset", 
+                label = "Download pre-processed data table (.CSV)")
+              )
             )
           )
           

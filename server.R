@@ -17,7 +17,7 @@ library(imputeTS)
 options(shiny.maxRequestSize = 100*1024^2)
 
 # global settings
-DEBUG_UPLOAD_ON  = F
+DEBUG_UPLOAD_ON  = T
 predictorFile = './data_arcodium/snowPredictors.csv'
 targetFile = './data_arcodium/snowTarget.csv'
 
@@ -46,6 +46,7 @@ shinyServer(function(input, output, session) {
   source(file.path("split_code", "server", "pre_processing_tab","server_plot_tab.R"),  local = TRUE)$v
   
   source(file.path("split_code", "server", "server_observe_obj.R"),  local = TRUE)$v
+  
   # Automatically stop a Shiny app when closing the browser tab (http://deanattali.com/blog/advanced-shiny-tips/)
   session$onSessionEnded(stopApp)  
 })

@@ -1,15 +1,10 @@
-
-
 ###################################################
 ################# Plot Tab ########################
 ###################################################
+
 output$plot <- renderDygraph({
   
-  # dependency
-  # input$plot
-  
   d <- v$data
-  
   if (is.null(d)
       ||
       is.null(input$plotY)
@@ -23,6 +18,7 @@ output$plot <- renderDygraph({
   # all subsequent elements/columns provide one or more series of y-values.
   
   # get selected X and Y
+  
   if(input$plotX == 'DataIndex'){
     DataIndex <- seq(from = 1, to = nrow(d))
     target <- cbind(DataIndex, d[input$plotY])
@@ -30,10 +26,36 @@ output$plot <- renderDygraph({
   else{
     target <- cbind(d[c(input$plotX,input$plotY)])
   }
-  
-  dygraph(target)
+  g <- dygraph(target)
+  for(i in colnames(target)){
+    if(is.na(as.numeric(target[1,i]))){
+      g<- dyShading()
+    }
+  }
   
 })
+
+
+observeEvent(input$plPrev, {
+  js$prevPl()
+})
+
+observeEvent(input$plNext, {
+  js$nextPl()
+})
+
+observeEvent(input$plSave, {
+  js$savePl()
+})
+
+
+
+
+
+
+
+
+
 
 # multiple plots
 output$mulplot <- renderUI({
