@@ -2,6 +2,9 @@
 ################# Plot Tab ########################
 ###################################################
 
+colorMax = 9
+colors = RColorBrewer::brewer.pal(colorMax, "Pastel1")
+
 output$plot <- renderDygraph({
   
   d <- v$data
@@ -26,35 +29,49 @@ output$plot <- renderDygraph({
   else{
     target <- cbind(d[c(input$plotX,input$plotY)])
   }
+  
+  # see which col have NA's
+  varWithNA = colnames(target)[colSums(is.na(target)) > 0]
+  
   g <- dygraph(target)
-  for(i in colnames(target)){
-    if(is.na(as.numeric(target[1,i]))){
-      g<- dyShading()
+
+  # shading for the non-numerical Data
+  for (n in colnames(target)) {
+    if (is.numeric(target[1,n]) == F) {
+      # checking for NAs
+      if(n %in% varWithNA){
+        return(g)
+      }
+      else{
+        # create an array with the start and end index of every category 
+        # using rle() function
+        w = rle(as.vector(target[,n]))
+        print(w)
+        e=0
+        l=c()
+        for(i in 1:length(w$lengths)){
+          s=e+1 #start point
+          e=e+w$lengths[i] # end point
+          # the array
+          l=rbind(l,c(s,e,w$values[i]))
+        }
+        # shading 
+        k = 1
+        for(x in unique(l[,3])){
+          print(x)
+          for(j in 1:nrow(l)){
+            if (x == l[j,3]){
+              g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])
+            }
+          }
+          k = k + 1
+        }
+      }
     }
   }
-  
+
+  return(g)
 })
-
-
-observeEvent(input$plPrev, {
-  js$prevPl()
-})
-
-observeEvent(input$plNext, {
-  js$nextPl()
-})
-
-observeEvent(input$plSave, {
-  js$savePl()
-})
-
-
-
-
-
-
-
-
 
 
 # multiple plots
@@ -66,7 +83,6 @@ output$mulplot <- renderUI({
   }
 
   result_div <- div()
-
   out <- lapply(input$plotY, function(i){
 
     if(input$plotX == 'DataIndex'){
@@ -87,8 +103,10 @@ output$mulplot <- renderUI({
 
     # output$xxx mush be defined before uiOutput("xxx") to make it work
     output[[tempName]] <- renderDygraph({
+      
       dygraph(target, main = i, group = 'mulplot') %>%
         dyOptions(colors = "black")
+      
     })
     dygraphOutput(tempName, width = "100%", height = "300px")
 
