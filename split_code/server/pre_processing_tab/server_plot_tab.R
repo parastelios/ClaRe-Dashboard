@@ -43,10 +43,9 @@ output$plot <- renderDygraph({
         return(g)
       }
       else{
-        # create an array with the start and end index of every category 
+        # create an array with the start and end index of every class 
         # using rle() function
         w = rle(as.vector(target[,n]))
-        print(w)
         e=0
         l=c()
         for(i in 1:length(w$lengths)){
@@ -57,11 +56,13 @@ output$plot <- renderDygraph({
         }
         # shading 
         k = 1
+        v$classes = unique(l[,3])
         for(x in unique(l[,3])){
           print(x)
           for(j in 1:nrow(l)){
             if (x == l[j,3]){
-              g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])
+              g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>% 
+              dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)
             }
           }
           k = k + 1
@@ -71,6 +72,7 @@ output$plot <- renderDygraph({
   }
 
   return(g)
+  print(classes)
 })
 
 

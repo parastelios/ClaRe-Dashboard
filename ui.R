@@ -171,11 +171,69 @@ dashboardPage(
           tabBox( 
             id = "preProTabs",
             width = 12,
-                  
             tabPanel(
               "Date/Time parser",
+              # date time buttons
               fluidRow(
-                # date time buttons
+                # allow x-flow for DT:dataTable
+                shinyjs::inlineCSS(list(
+                  ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                )),
+                align = 'center',
+                box(
+                  width = 6,
+                  title = "Predictor's Timestamp", 
+                  column(4,
+                      selectInput('preTimeCol', 
+                                  'Chose Column with timestamp:', 
+                                  choices = c('column'), 
+                                  multiple = F
+                      )
+                  ),
+                  column(8,
+                         uiOutput("predictor1Table")
+                         ),
+                  column(12,
+                         align = 'left',
+                         h5(strong('Timestamp Preview: ')),
+                         box(
+                           width = 12,
+                           align = 'center',
+                           h4(uiOutput('preTimestamp'))
+                         )
+                  ),
+                  column(6,
+                        h5('If integer convert to Timestamp'),
+                        actionButton('preTimeConvert','Convert')
+                  )
+                ),
+                box(
+                  width = 6,
+                  title = "Target's Timestamp", 
+                  column(4,
+                         selectInput('tarTimeCol', 
+                                     'Chose Column with timestamp:', 
+                                     choices = c('column'), 
+                                     multiple = F
+                         )
+                  ),
+                  column(8,
+                         uiOutput("target1Table")
+                        ),
+                  column(12,
+                         align = 'left',
+                         h5(strong('Timestamp Preview: ')),
+                         box(
+                           width = 12,
+                           align = 'center',
+                           h4(uiOutput('tarTimestamp'))
+                         )
+                  ),
+                  column(6,
+                         h5('If integer convert to Timestamp'),
+                         actionButton('preTimeConvert','Convert')
+                  )
+                )
               )
             ),
             tabPanel(
@@ -185,7 +243,8 @@ dashboardPage(
                 box(
                   width = 5,
                   selectInput('predictorField', 'Predictor Field', choices = c('Please select a field to merge upon'), multiple = F)
-                ),box(
+                ),
+                box(
                   width = 5,
                   selectInput('targetField', 'Target Field', choices = c('Please select a field to merge upon'), multiple = F)
                 ),
@@ -249,69 +308,88 @@ dashboardPage(
                              )
                       )
                     )
-                
                   )
                 )
+            ),
+            tabPanel(
+              "Other Options",
+              fluidRow(
+                # others like normalizing etc.
+                shinyjs::inlineCSS(list(
+                  "#shiny-tab-preprocessing .goButton" = "position: absolute; right:10px; bottom: 20px"
+                )),
+                box(
+                  width = 4,
+                  height = "200px",
+                  title = "Excludes",
+                  selectInput('excludingVar', 'Exclude Predictor variable(s)', choices = c('Please Merge for options'), multiple = T),
+                  actionButton('goExcludingVar', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                  bsModal("popExcludingVar", "Excludes", "goExcludingVar", size = "small", uiOutput("uiExcludingVar"))
+                ),
+                box(
+                  width = 4,
+                  height = "200px",
+                  title = "Outlier Removal",
+                  selectInput('outlierRemoval', 'Select a variable', choices = c('Please Merge for options'), multiple = F),
+                  actionButton('goOutlierRemoval', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                  bsModal("popOutlierRemoval", "Outlier Removal", "goOutlierRemoval", size = "large",uiOutput("uiOutlierRemoval"))
+                ),
+                box(
+                  width = 3,
+                  title = "Data Normalization",
+                  actionButton('goNormalizing', 'GO', class="goButton", icon = icon("arrow-circle-right"))
+                ),
+                box(
+                  width = 12,
+                  title = "Conditions",
+                  fluidRow(
+                    column(3,selectInput('variableCon', 'If', choices = c('Please Merge for options'), multiple = F)),
+                    conditionalPanel(
+                      "output.check3",
+                      column(1,selectInput('equalCon1', '.', choices = c('==','>=','<=','>','<'), multiple = F)),
+                      column(2,numericInput('numberCon', label='.', value=0)),
+                      column(2,selectInput('actionCon1', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
+                      conditionalPanel("input.actionCon1 == 'Replace with'",
+                                       column(2, 
+                                              numericInput('replaceCon1', 
+                                                           label='.', value=0)
+                                       )
+                      ),
+                      column(2,
+                             style="padding-top:30px; font-weight: bold",
+                             textOutput('rowSelected1')
+                             ),
+                      column(12, align = 'left',
+                             actionButton('goConditions1', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                             )
+                    ),
+                    conditionalPanel(
+                      "output.check4",
+                      column(1,selectInput('equalCon2', '.', choices = c('==','!='), multiple = F)),
+                      column(2,textInput('textCon', label='.', value= '', placeholder = 'type input')),
+                      # column(2,selectInput('textCon', '.', choices = c('Please merge for options'), multiple = F)),
+                      column(2,selectInput('actionCon2', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
+                      conditionalPanel("input.actionCon2 == 'Replace with'",
+                                       column(2,
+                                              textInput('replaceCon2', label='.', value='', placeholder = 'type input')
+                                              )
+                                       ),
+                      column(2,
+                             style="padding-top:30px; font-weight: bold",
+                             textOutput('rowSelected2')
+                             ),
+                      column(12, align = 'left',
+                             actionButton('goConditions2', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                             )
+                    ),
+                    conditionalPanel(
+                      "output.check5",
+                      column(4, align = 'center', h4("The chosen variable has NA values. Manage missing values for options "))
+                    )
+                  )
+                )
+              )
             )
-            # tabPanel(
-            #   "Other Options",
-            #   fluidRow(
-            #     # others like normalizing etc.
-            #     shinyjs::inlineCSS(list(
-            #       "#shiny-tab-preprocessing .goButton" = "position: absolute; right:10px; bottom: 20px"
-            #     )),
-            #     box(
-            #       width = 4,
-            #       height = "250px",
-            #       title = "Excludes",
-            #       # selectInput('excludings', 'Value Range', choices = c('Please select a dataset'), multiple = T)
-            #       selectInput('excludingPreVar', 'Exclude Predictor variable(s)', choices = c('Please select a Predictors'), multiple = T),
-            #       selectInput('excludingTarVar', 'Exclude Target variable(s)', choices = c('Please select a Predictors'), multiple = T),
-            #       actionButton('goExcludingVar', 'Go', class="goButton", icon = icon("arrow-circle-right")),
-            #       bsModal("popExcludingVar", "Excludes", "goExcludingVar", size = "small", uiOutput("uiExcludingVar"))
-            #     ),
-            #     box(
-            #       width = 4,
-            #       height = "200px",
-            #       title = "Outlier Removal",
-            #       selectInput('outlierRemoval', 'Select a variable', choices = c('Please select a dataset'), multiple = F),
-            #       actionButton('goOutlierRemoval', 'Go', class="goButton", icon = icon("arrow-circle-right")),
-            #       bsModal("popOutlierRemoval", "Outlier Removal", "goOutlierRemoval", size = "large",uiOutput("uiOutlierRemoval"))
-            #     ),
-            #     box(
-            #       width = 4,
-            #       height = "200px",
-            #       title = "Normalization",
-            #       # checkboxInput('normalizing', 'Normalizing', FALSE),
-            #       radioButtons('normalizing', 'Normalization',c('ON'=T,'OFF'=F),T)
-            #       ,
-            #       actionButton('goNormalizing', 'Go', class="goButton", icon = icon("arrow-circle-right"))
-            #     ),
-            #     box(
-            #       width = 8,
-            #       height = "210px",
-            #       title = "Conditions",
-            #       fluidRow(
-            #         column(4,selectInput('variableCon', 'If', choices = c('.'), multiple = F)),
-            #         column(4,selectInput('equalCon', '.', choices = c('==','>=','<=','>','<'), multiple = F)),
-            #         column(4,numericInput('numberCon', label='.', value=0))
-            #       ),
-            #       fluidRow(
-            #         column(4,selectInput('actionCon', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
-            #         
-            #         conditionalPanel("input.actionCon == 'Replace with'",
-            #                          column(4,numericInput('replaceCon', label='.', value=0))
-            #         ),
-            #         column(3, 
-            #                style="padding-top:30px; font-weight: bold",
-            #                textOutput('rowSelected'))
-            #       ),
-            #       
-            #       actionButton('goConditions', 'Go', class="goButton", icon = icon("arrow-circle-right"))
-            #     )
-            #     
-            #   )
-            # )
           ),
           tabBox(
             # plot and data review
@@ -320,11 +398,17 @@ dashboardPage(
               "Plotting",
               fluidRow(
                 #plots
-                box(width = 6,
+                column(4,
                     selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
                 ),
-                box(width = 6,
-                    selectInput('plotY', 'Y Varaible(s)', choices = c('Please select a dataset'), multiple = T)
+                column(4,
+                    selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+                ),
+                conditionalPanel(
+                  column(4,
+                         selectInput('plotClass', 'Classes to plot', choices = c('Select Class'), multiple = T) 
+                )
+                
                 ),
                 tabBox(
                   width = 12,

@@ -2,80 +2,15 @@
 ################# Other Options Tab ##############
 ###################################################
 
-# click go button for normalizing
-observeEvent(input$goNormalizing, {
-  normalizingData(input$normalizing)
-})
-
-normalizingData <- function(normalizing){
-  if(normalizing){
-    # record the maximum for all varaibles to recover
-    
-    tempMax <- sapply(colnames(v$data),function(i){
-      max(v$data[i])
-    })
-    tempMin <- sapply(colnames(v$data),function(i){
-      min(v$data[i])
-    })
-    
-    if(
-      length(which(tempMax == 1)) == length(tempMax)    # all tempMax == 1 
-      && length(which(tempMin == 0)) == length(tempMin) # all tempMin == 0 
-    ){
-      # it looks like that data has been normailized already
-      # so keep previous max/min and skip normalizeTS (since it has no effect)
-      v$data
-    }
-    else{
-      v$dataMax <- tempMax
-      v$dataMin <- tempMin
-      v$data <- normalizeTS(v$data)
-    }
-  }
-  # user choose to go to original data
-  else{
-    # recover by multipling the max values and min
-    if(!is.null(v$dataMax)){
-      for(i in colnames(v$data)){
-        v$data[i] <- v$data[i] * (v$dataMax[i] - v$dataMin[i]) + v$dataMin[i]
-      }
-    }
-  }
-  return(v$data)
-}
-
 # remove excluding variables
 observeEvent(input$confirmExcludingVar, {
   toggleModal(session, "popExcludingVar")
   v$data <- v$data[setdiff(colnames(v$data),input$excludingVar)]
+  renderMergedDataTable(v$data)
 })
 
-
-# execute condition
-observeEvent(input$goConditions, {
-  
-  # get index of rows according to the conditions
-  aIndex <- do.call(input$equalCon, list(
-    v$data[input$variableCon],
-    input$numberCon
-  )
-  )
-  
-  # at least one element
-  if(TRUE %in% aIndex){
-    if(input$actionCon == "Remove line"){
-      v$data <- v$data[!aIndex,] 
-    }
-    else if(input$actionCon == "Replace with"){
-      v$data[aIndex, input$variableCon] <- input$replaceCon
-    }
-  }
-  
-  
-})
 
 output$uiExcludingVar <- renderUI({
-  
   tempText <- input$excludingVar
   output$showExcludingVar <- renderText({
     if(is.null(tempText)){
@@ -90,7 +25,58 @@ output$uiExcludingVar <- renderUI({
     tags$h4(textOutput("showExcludingVar")) ,
     bsButton('confirmExcludingVar', 'Confirm Excluding', style = "danger")
   )
-  
+})
+
+
+# click go button for normalizing
+observeEvent(input$goNormalizing, {
+  v$data <- normalizingData(input$normalizing)
+  renderMergedDataTable(v$data)
+  })
+
+# normalize function
+normalizeTS <- function(data) {
+  for(j in 1:ncol(data)) {
+    # check numeric
+    if(sapply(data[j], is.numeric)){
+      minData <- min(data[,j], na.rm=TRUE)
+      maxData <- max(data[,j], na.rm=TRUE)
+      
+      if(minData < maxData) {
+        data[,j] <- (data[,j]-minData)/(maxData-minData)
+      }
+      # if minData equals maxData exactly
+      else{
+        data[j] <- 1
+      }
+    }
+  }
+  return(data)
+}
+
+normalizingData <- function(normalizing){
+  # record the maximum for all varaibles to recover
+  tempMax <- sapply(colnames(v$data),function(i){
+    if (is.numeric(v$data[1,i]) == T) {
+      max(v$data[i])
+    }
+  })
+  tempMin <- sapply(colnames(v$data),function(i){
+    if (is.numeric(v$data[1,i]) == T) {
+      min(v$data[i])
+    }
+  })
+  v$dataMax <- tempMax
+  v$dataMin <- tempMin
+  v$data <- normalizeTS(v$data)
+  return(v$data)
+}
+
+
+# Outlier remover
+observeEvent(input$confirmOutlierRemoval, {
+  v$data <- v$data[-v$todoOutlierIndex, ]
+  renderMergedDataTable(v$data)
 })
 
 # the content inside the popup
@@ -115,7 +101,7 @@ output$uiOutlierRemoval <- renderUI({
       graph <- dyEvent(graph, i, labelLoc = "bottom", color = "#DF4A32",  strokePattern = "solid")
     }
     for(i in unique(X[aIndex,])){
-      graph <- dyLimit(graph, i, paste0("Farthest from average: ",i),  labelLoc = "right", color = "red", strokePattern = "dotted")   
+      graph <- dyLimit(graph, i, paste0("Farthest from average: ",i),  labelLoc = "right", color = "red", strokePattern = "dotted")
     }
     
     graph
@@ -127,54 +113,92 @@ output$uiOutlierRemoval <- renderUI({
   
   dop <- dygraphOutput(plotName, width = "100%", height = "300px")
   result_div <- tagAppendChild(result_div, dop)
-  result_div <- tagAppendChild(result_div, 
+  result_div <- tagAppendChild(result_div,
                                # div(
-                               # 
+                               #
                                div(
                                  style="padding: 20px 0 10px; text-align:center;",
-                                 
                                  tags$h4(
-                                   tags$strong(length(aIndex))," row(s) selected, with value of ", 
+                                   tags$strong(length(aIndex))," row(s) selected, with value of ",
                                    tags$strong( toString(unique(X[aIndex,])) )
                                  ),
                                  bsButton('confirmOutlierRemoval', 'Confirm Remove', style = "danger")
                                )
   )
-  
   v$todoOutlierIndex <- aIndex
   v$todoOutlierName <- name
-  
   result_div
-  
 })
 
 
-observeEvent(input$confirmOutlierRemoval, {
-  v$data <- v$data[-v$todoOutlierIndex, ]
-})
-
-
-
-# data preview
-output$inputTable <- DT::renderDataTable({
-  d <- v$data
-  if (is.null(d))
-    return()
-  DT::datatable(d, options = list(pageLength = 20))
-})
-
-output$inputSummary <- renderPrint({
-  d <- v$data
-  if (is.null(d))
-    return()
-  summary(d)
-})
-
-output$processedDataset <- downloadHandler(
-  filename = function() {
-    paste('data-', Sys.time(), '.csv', sep='')
-  },
-  content = function(file) {
-    write.csv(v$data, file, row.names=FALSE)
+# execute condition
+# numerical
+observeEvent(input$goConditions1, {
+  # get index of rows according to the conditions
+  aIndex1 <- do.call(input$equalCon1, 
+                    list(
+                      v$data[input$variableCon],
+                      input$numberCon
+                      )
+                    )
+  # at least one element
+  if(TRUE %in% aIndex1){
+    if(input$actionCon1 == "Remove line"){
+      v$data <- v$data[!aIndex1,]
+    }
+    else if(input$actionCon1 == "Replace with"){
+      v$data[aIndex1, input$variableCon] <- input$replaceCon1
+    }
   }
-)
+  renderMergedDataTable(v$data)
+})
+
+
+# non numerical
+observeEvent(input$goConditions2, {
+  # get index of rows according to the conditions
+  aIndex2 <- do.call(input$equalCon2, 
+                     list(
+                       v$data[input$variableCon],
+                       input$textCon
+                     )
+  )
+  # at least one element
+  if(TRUE %in% aIndex2){
+    if(input$actionCon2 == "Remove line"){
+      v$data <- v$data[!aIndex2,]
+    }
+    else if(input$actionCon2 == "Replace with"){
+      v$data[aIndex2, input$variableCon] <- input$replaceCon2
+    }
+  }
+  renderMergedDataTable(v$data)
+})
+
+# checking if conditionvalues is numeric or not 
+output$check3 <- reactive({
+  l1 = input$variableCon
+  a1 = is.numeric(v$data[1,l1]) && !(sum(is.na(v$data[,l1]))>0)
+  # print(a1)
+  # print(l1)
+  return(a1)
+})
+outputOptions(output, 'check3', suspendWhenHidden = FALSE)
+
+output$check4 <- reactive({
+  l2 = input$variableCon
+  a2 = ! is.numeric(v$data[1,l2]) && !(sum(is.na(v$data[,l2]))>0)
+  # print(a2)
+  # print(l2)
+  return(a2)
+})
+outputOptions(output, 'check4', suspendWhenHidden = FALSE)
+
+output$check5 <- reactive({
+  l3 = input$variableCon
+  if (sum(is.na(v$data[,l3]))>0) {
+    a3 = TRUE
+  }
+  return(a3)
+})
+outputOptions(output, 'check5', suspendWhenHidden = FALSE)

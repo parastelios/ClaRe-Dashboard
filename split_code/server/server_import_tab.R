@@ -1,6 +1,6 @@
 
 ###################################################
-################# Import Tab  ####################
+###########        Import Tab          ############
 ###################################################
 
 ###################################################
@@ -13,9 +13,11 @@ updatePreFileInput <- function (name = NULL){
     result <- div()
     
     result <- tagAppendChild(
-      result,
-      fileInput(paste0('prefile', index), 'Choose Predictor File',accept=c('text/csv','text/comma-separated-values,text/plain','.csv'))
-    )
+                              result,
+                              fileInput(paste0('prefile', index), 
+                              'Choose Predictor File',
+                              accept=c('text/csv','text/comma-separated-values,text/plain','.csv'))
+                              )
     
     if(!is.null(name)){
       result <- tagAppendChild(
@@ -46,8 +48,7 @@ dataInputPredictor <- reactive({
   
   # upload debug
   if(DEBUG_UPLOAD_ON){
-    d_pre <- data.frame( read.csv(predictorFile))  
-    # d_pre <- d_pre[sapply(d_pre, is.numeric)]
+    d_pre <- data.frame(read.csv(predictorFile))  
     v$data_pre <- d_pre
     return(v$data_pre)
   } 

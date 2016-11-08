@@ -11,14 +11,23 @@ observeEvent(input$merge, {
   renderMergedDataTable(v$data)
 })
 
+
 mergeData <- function(predictor, target, fieldA, fieldB) {
+  # merge
   d_merged = merge(predictor, target, by.x=fieldA, by.y=fieldB, all=TRUE)
+  # rename the columns with same name between Predictors and Target
+  sameColNames = intersect(colnames(predictor), colnames(target))
+  if(is.null(sameColNames) == FALSE){
+    for (i in sameColNames) {
+      colnames(d_merged)[colnames(d_merged)== i] <- paste0(i,"_Tar")
+    }
+  }
   return(d_merged)
 }
 
 renderMergedDataTable <- function(data) {
   output$dataTable <- renderUI({
-    
+    # print(data)
     if (is.null(data)){
       fluidRow(box(
         width = 12,
@@ -41,7 +50,6 @@ renderMergedDataTable <- function(data) {
     summary(data)
   })
 }
-
 
 ####### Columns with NA #########
 getColWithNAEntries <- function(array) {
