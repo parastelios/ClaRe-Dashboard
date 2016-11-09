@@ -7,6 +7,7 @@ observeEvent(input$confirmExcludingVar, {
   toggleModal(session, "popExcludingVar")
   v$data <- v$data[setdiff(colnames(v$data),input$excludingVar)]
   renderMergedDataTable(v$data)
+  
 })
 
 
@@ -32,6 +33,7 @@ output$uiExcludingVar <- renderUI({
 observeEvent(input$goNormalizing, {
   v$data <- normalizingData(input$normalizing)
   renderMergedDataTable(v$data)
+  
   })
 
 # normalize function
@@ -77,6 +79,7 @@ normalizingData <- function(normalizing){
 observeEvent(input$confirmOutlierRemoval, {
   v$data <- v$data[-v$todoOutlierIndex, ]
   renderMergedDataTable(v$data)
+  
 })
 
 # the content inside the popup
@@ -173,32 +176,33 @@ observeEvent(input$goConditions2, {
     }
   }
   renderMergedDataTable(v$data)
+  
 })
 
 # checking if conditionvalues is numeric or not 
-output$check3 <- reactive({
+output$condCheck1 <- reactive({
   l1 = input$variableCon
   a1 = is.numeric(v$data[1,l1]) && !(sum(is.na(v$data[,l1]))>0)
   # print(a1)
   # print(l1)
   return(a1)
 })
-outputOptions(output, 'check3', suspendWhenHidden = FALSE)
+outputOptions(output, 'condCheck1', suspendWhenHidden = FALSE)
 
-output$check4 <- reactive({
+output$condCheck2 <- reactive({
   l2 = input$variableCon
   a2 = ! is.numeric(v$data[1,l2]) && !(sum(is.na(v$data[,l2]))>0)
   # print(a2)
   # print(l2)
   return(a2)
 })
-outputOptions(output, 'check4', suspendWhenHidden = FALSE)
+outputOptions(output, 'condCheck2', suspendWhenHidden = FALSE)
 
-output$check5 <- reactive({
+output$condCheck3 <- reactive({
   l3 = input$variableCon
   if (sum(is.na(v$data[,l3]))>0) {
     a3 = TRUE
   }
   return(a3)
 })
-outputOptions(output, 'check5', suspendWhenHidden = FALSE)
+outputOptions(output, 'condCheck3', suspendWhenHidden = FALSE)

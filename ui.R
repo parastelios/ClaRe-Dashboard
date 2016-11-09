@@ -265,7 +265,7 @@ dashboardPage(
                              )
                     ),
                     conditionalPanel(
-                      "output.check1",
+                      "output.mergecheck1",
                       column(6,
                              selectizeInput(
                                'theNApolicy', "The target is Numerical, Select NA's Policy",
@@ -300,7 +300,7 @@ dashboardPage(
                              )
                        ),
                     conditionalPanel(
-                      "output.check2",
+                      "output.mergecheck2",
                       column(6, 
                              "Non-Numerical target, as a result Repeat NA's Policy should be used",
                              column(12, offset = 4,
@@ -345,7 +345,7 @@ dashboardPage(
                   fluidRow(
                     column(3,selectInput('variableCon', 'If', choices = c('Please Merge for options'), multiple = F)),
                     conditionalPanel(
-                      "output.check3",
+                      "output.condCheck1",
                       column(1,selectInput('equalCon1', '.', choices = c('==','>=','<=','>','<'), multiple = F)),
                       column(2,numericInput('numberCon', label='.', value=0)),
                       column(2,selectInput('actionCon1', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
@@ -364,8 +364,8 @@ dashboardPage(
                              )
                     ),
                     conditionalPanel(
-                      "output.check4",
-                      column(1,selectInput('equalCon2', '.', choices = c('==','!='), multiple = F)),
+                      "output.condCheck2",
+                      column(2,selectInput('equalCon2', '.', choices = c('==','!='), multiple = F)),
                       column(2,textInput('textCon', label='.', value= '', placeholder = 'type input')),
                       # column(2,selectInput('textCon', '.', choices = c('Please merge for options'), multiple = F)),
                       column(2,selectInput('actionCon2', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
@@ -383,7 +383,7 @@ dashboardPage(
                              )
                     ),
                     conditionalPanel(
-                      "output.check5",
+                      "output.condCheck3",
                       column(4, align = 'center', h4("The chosen variable has NA values. Manage missing values for options "))
                     )
                   )
@@ -404,17 +404,18 @@ dashboardPage(
                 column(4,
                     selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
                 ),
-                conditionalPanel(
+                # conditionalPanel(
+                #   'output.classPlotcheck'
                   column(4,
                          selectInput('plotClass', 'Classes to plot', choices = c('Select Class'), multiple = T) 
-                )
+                # )
                 
                 ),
                 tabBox(
                   width = 12,
-                  tabPanel("Plot", dygraphOutput("plot"))
-                  ,tabPanel("Multi-plot", uiOutput("mulplot"))
-                  ,tabPanel("Correlation", uiOutput("corplot"))
+                  tabPanel("Plot", dygraphOutput("plot")),
+                  tabPanel("Multi-plot", uiOutput("mulplot")),
+                  tabPanel("Correlation", uiOutput("corplot"))
                 )
               )
             ),

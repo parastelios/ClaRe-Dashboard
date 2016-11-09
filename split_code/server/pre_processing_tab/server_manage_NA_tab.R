@@ -10,7 +10,7 @@ observeEvent(input$interpolate, {
   method = input$interpolationMethod
   v$data = interpolateColValues(v$data, names, method)
   renderMergedDataTable(v$data)
-  #print(names)
+  
 })
 
 interpolateColValues <- function(array, colNameList, method) {

@@ -58,22 +58,22 @@ getColWithNAEntries <- function(array) {
 }
 
 # checking if cloWithNAvalues is numeric or not to use it for interpolate or repeating
-output$check1 <- reactive({
+output$mergecheck1 <- reactive({
   l1 = input$colWithNAvalues
   a1 = is.numeric(v$target[1,l1])
   # print(a1)
   # print("1")
   return(a1)
 })
-outputOptions(output, 'check1', suspendWhenHidden = FALSE)
+outputOptions(output, 'mergecheck1', suspendWhenHidden = FALSE)
 
-output$check2 <- reactive({
+output$mergecheck2 <- reactive({
   l2 = input$colWithNAvalues
   a2 = ! is.numeric(v$target[1,l2])
   # print(a2)
   # print("2")
   return(a2)
 })
-outputOptions(output, 'check2', suspendWhenHidden = FALSE)
+outputOptions(output, 'mergecheck2', suspendWhenHidden = FALSE)
 
 

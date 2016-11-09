@@ -30,39 +30,46 @@ output$plot <- renderDygraph({
     target <- cbind(d[c(input$plotX,input$plotY)])
   }
   
-  # see which col have NA's
-  varWithNA = colnames(target)[colSums(is.na(target)) > 0]
+  g <- dygraph(target)%>% 
+    dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
   
-  g <- dygraph(target)
+  # check which col have NA's
+  varWithNA = colnames(target)[colSums(is.na(target)) > 0]
 
   # shading for the non-numerical Data
   for (n in colnames(target)) {
     if (is.numeric(target[1,n]) == F) {
-      # checking for NAs
-      if(n %in% varWithNA){
-        return(g)
+      # create an array with the start and end index of every class 
+      # using rle() function
+      w = rle(as.vector(target[,n]))
+      e=0
+      l=c()
+      for(i in 1:length(w$lengths)){
+        s=e+1 #start point
+        e=e+w$lengths[i] # end point
+        # the array
+        l=rbind(l,c(s,e,w$values[i]))
+      }
+      
+      # shading 
+      v$classes = unique(l[,3])
+      if(is.null(input$plotClass)){
+        g
       }
       else{
-        # create an array with the start and end index of every class 
-        # using rle() function
-        w = rle(as.vector(target[,n]))
-        e=0
-        l=c()
-        for(i in 1:length(w$lengths)){
-          s=e+1 #start point
-          e=e+w$lengths[i] # end point
-          # the array
-          l=rbind(l,c(s,e,w$values[i]))
-        }
-        # shading 
         k = 1
-        v$classes = unique(l[,3])
-        for(x in unique(l[,3])){
-          print(x)
+        for(x in input$plotClass){
           for(j in 1:nrow(l)){
-            if (x == l[j,3]){
+            if(is.na(l[j,3]) | is.na(x)){
+              check = FALSE
+            }
+            else{
+              check = (x == l[j,3]) 
+            }
+            if (check){
               g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>% 
-              dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)
+                # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>% 
+                dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
             }
           }
           k = k + 1
@@ -71,8 +78,7 @@ output$plot <- renderDygraph({
     }
   }
 
-  return(g)
-  print(classes)
+  g
 })
 
 
@@ -106,9 +112,53 @@ output$mulplot <- renderUI({
     # output$xxx mush be defined before uiOutput("xxx") to make it work
     output[[tempName]] <- renderDygraph({
       
-      dygraph(target, main = i, group = 'mulplot') %>%
-        dyOptions(colors = "black")
+      g <- dygraph(target, main = i, group = 'mulplot') %>%
+            dyOptions(colors = "black")
+      # check which col have NA's
+      varWithNA = colnames(target)[colSums(is.na(target)) > 0]
       
+      # shading for the non-numerical Data
+      for (n in colnames(target)) {
+        if (is.numeric(target[1,n]) == F) {
+          # create an array with the start and end index of every class 
+          # using rle() function
+          w = rle(as.vector(target[,n]))
+          e=0
+          l=c()
+          for(i in 1:length(w$lengths)){
+            s=e+1 #start point
+            e=e+w$lengths[i] # end point
+            # the array
+            l=rbind(l,c(s,e,w$values[i]))
+          }
+          
+          # shading 
+          v$classes = unique(l[,3])
+          if(is.null(input$plotClass)){
+            return(g)
+          }
+          else{
+            k = 1
+            for(x in input$plotClass){
+              for(j in 1:nrow(l)){
+                if(is.na(l[j,3]) | is.na(x)){
+                  check = FALSE
+                }
+                else{
+                  check = (x == l[j,3]) 
+                }
+                if (check){
+                  g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>% 
+                    # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>% 
+                    dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
+                }
+              }
+              k = k + 1
+            }
+          }
+        }
+      }
+      return(g)
     })
     dygraphOutput(tempName, width = "100%", height = "300px")
 
