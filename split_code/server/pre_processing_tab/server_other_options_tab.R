@@ -7,9 +7,7 @@ observeEvent(input$confirmExcludingVar, {
   toggleModal(session, "popExcludingVar")
   v$data <- v$data[setdiff(colnames(v$data),input$excludingVar)]
   renderMergedDataTable(v$data)
-  
 })
-
 
 output$uiExcludingVar <- renderUI({
   tempText <- input$excludingVar
@@ -172,6 +170,9 @@ observeEvent(input$goConditions2, {
       v$data <- v$data[!aIndex2,]
     }
     else if(input$actionCon2 == "Replace with"){
+      # replace class names
+      aLevelIndex <- which(levels(v$data[, input$variableCon]) == input$textCon)
+      levels(v$data[, input$variableCon])[aLevelIndex] <- input$replaceCon2
       v$data[aIndex2, input$variableCon] <- input$replaceCon2
     }
   }

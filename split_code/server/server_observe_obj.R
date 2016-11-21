@@ -15,16 +15,19 @@ observe({
   ############## merge tab ##############
   updateSelectInput(session, "predictorField", choices = d_preCol)
   updateSelectInput(session, "targetField", choices = d_tarCol)
+  updateSelectInput(session, "targetOption", choices = d_tarCol)
+  updateSelectInput(session, "excludingPre", choices = d_preCol)
   updateSelectInput(session, "colWithNAvalues", choices = v$d_colNA)
   ############## plot tab ##############
   updateSelectInput(session, "plotY", choices = d_Col)
   updateSelectInput(session, "plotX", choices = c("DataIndex", d_Col))
   updateSelectInput(session, "plotClass", choices = v$classes)
   ########## other optopns tab #########
-  updateSelectInput(session, "excludingVar", choices = d_Col)
+  # updateSelectInput(session, "excludingVar", choices = d_Col)
   # this will refresh all components
   # let's keep outlierRemoval as previous
   # TODO: Click the button, put the name in storage
+  updateSelectInput(session, "excludingVar", choices = d_Col)
   updateSelectInput(session, "outlierRemoval", choices =  d_Col, selected = v$todoOutlierName)
   updateSelectInput(session, "variableCon", choices = d_Col)
   # updateSelectInput(session, "textCon", choices = variableCon)

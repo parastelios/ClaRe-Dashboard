@@ -240,17 +240,44 @@ dashboardPage(
               "Merge",
               fluidRow(
                 # merge data
-                box(
-                  width = 5,
-                  selectInput('predictorField', 'Predictor Field', choices = c('Please select a field to merge upon'), multiple = F)
+                box(width = 4, 
+                    title = '1. Select Merge Fields:',
+                    column(12,
+                           selectInput('targetField', 'Target', choices = c('Please select a field to merge upon'), multiple = F)
+                           ),   
+                    column(12,
+                           selectInput('predictorField', 'Predictor', choices = c('Please select a field to merge upon'), multiple = F)
+                    )
                 ),
-                box(
-                  width = 5,
-                  selectInput('targetField', 'Target Field', choices = c('Please select a field to merge upon'), multiple = F)
+                box(width = 4,
+                    title = '2. Choices:',
+                    column(12,
+                           selectInput('targetOption', 'Choose your Target variable:', choices = c('Please select Target'))
+                           ),
+                    column(12,
+                           selectInput('excludingPre', 'Exclude Predictor variable(s)', choices = c('Select variable(s)'), multiple = T)
+                          )
                 ),
-                column(width = 2, onset = 2, actionButton("merge", "Merge"))
+                box(width = 4, 
+                    title = '3. Create merged Dataset:',
+                    actionButton('merge', 'Go Merge', class="goButton", icon = icon("arrow-circle-right")),
+                    bsModal("popMerge", "Merging Choices", "merge", size = "large", uiOutput("uiMerging"))
+                       )
               )
             ),
+            #     box(width = 6,
+            #       column(10,
+            #         selectInput('predictorField', 'Predictor Field', choices = c('Please select a field to merge upon'), multiple = F)
+            #       ),
+            #       column(10,
+            #         selectInput('targetField', 'Target Field', choices = c('Please select a field to merge upon'), multiple = F)
+            #       ),
+            #       column(width = 2, onset = 2, actionButton("merge", "Merge"))
+            #     ),
+            #       
+            #     )
+            #   )
+            # ),
             tabPanel(
               "Manage missing values",
               fluidRow(
@@ -322,22 +349,28 @@ dashboardPage(
                   width = 4,
                   height = "200px",
                   title = "Excludes",
-                  selectInput('excludingVar', 'Exclude Predictor variable(s)', choices = c('Please Merge for options'), multiple = T),
-                  actionButton('goExcludingVar', 'Go', class="goButton", icon = icon("arrow-circle-right")),
-                  bsModal("popExcludingVar", "Excludes", "goExcludingVar", size = "small", uiOutput("uiExcludingVar"))
+                  selectInput('excludingVar', 'Exclude variable(s)', choices = c('Please Merge for options'), multiple = T),
+                  column(12, align = 'right',
+                         actionButton('goExcludingVar', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                         bsModal("popExcludingVar", "Excludes", "goExcludingVar", size = "small", uiOutput("uiExcludingVar"))
+                  )
                 ),
                 box(
                   width = 4,
                   height = "200px",
                   title = "Outlier Removal",
                   selectInput('outlierRemoval', 'Select a variable', choices = c('Please Merge for options'), multiple = F),
-                  actionButton('goOutlierRemoval', 'Go', class="goButton", icon = icon("arrow-circle-right")),
-                  bsModal("popOutlierRemoval", "Outlier Removal", "goOutlierRemoval", size = "large",uiOutput("uiOutlierRemoval"))
+                  column(12, align ='right',
+                         actionButton('goOutlierRemoval', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                         bsModal("popOutlierRemoval", "Outlier Removal", "goOutlierRemoval", size = "large",uiOutput("uiOutlierRemoval"))
+                         )
                 ),
                 box(
-                  width = 3,
+                  width = 4,
+                  height = "200px",
                   title = "Data Normalization",
-                  actionButton('goNormalizing', 'GO', class="goButton", icon = icon("arrow-circle-right"))
+                  align = 'right',
+                  actionButton('goNormalizing', 'Go', class="goButton", icon = icon("arrow-circle-right"))
                 ),
                 box(
                   width = 12,
@@ -358,10 +391,10 @@ dashboardPage(
                       column(2,
                              style="padding-top:30px; font-weight: bold",
                              textOutput('rowSelected1')
-                             ),
-                      column(12, align = 'left',
+                      ),
+                      column(12, align = 'right',
                              actionButton('goConditions1', 'Go', class="goButton", icon = icon("arrow-circle-right"))
-                             )
+                      )
                     ),
                     conditionalPanel(
                       "output.condCheck2",
@@ -372,15 +405,15 @@ dashboardPage(
                       conditionalPanel("input.actionCon2 == 'Replace with'",
                                        column(2,
                                               textInput('replaceCon2', label='.', value='', placeholder = 'type input')
-                                              )
-                                       ),
+                                       )
+                      ),
                       column(2,
                              style="padding-top:30px; font-weight: bold",
                              textOutput('rowSelected2')
-                             ),
-                      column(12, align = 'left',
+                      ),
+                      column(12, align = 'right',
                              actionButton('goConditions2', 'Go', class="goButton", icon = icon("arrow-circle-right"))
-                             )
+                      )
                     ),
                     conditionalPanel(
                       "output.condCheck3",
@@ -396,6 +429,36 @@ dashboardPage(
             width = 12,
             tabPanel(
               "Plotting",
+              # fluidRow(
+              #   #plots
+              #   column(2,
+              #     radioButtons('plotType', 'Select Plot',
+              #                  c(Simple='simplePlot',
+              #                    Multiple='multiPlot',
+              #                    Correlation='corrPlot'),
+              #                  selected = 'simplePlot')
+              #   ),
+              #   # column(4,
+              #   #   selectInput('plotType', 'Select Plot', choices = c('Simple', 'Multiple', 'Correlation'), multiple = F)
+              #   # )
+              #   column(3,
+              #          selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+              #   ),
+              #   column(3,
+              #          selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+              #   ),
+              #   conditionalPanel(
+              #     'output.classPlotcheck',
+              #     column(3, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
+              #   ),
+              #   column(3, align = 'right', offset = 8,
+              #          actionButton('preProsPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
+              #   ),
+              #   tabBox(
+              #         width = 12,
+              #      dygraphOutput("plot")
+              #      )
+              # )
               fluidRow(
                 #plots
                 column(4,
@@ -405,12 +468,10 @@ dashboardPage(
                     selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
                 ),
                 # conditionalPanel(
-                #   'output.classPlotcheck'
-                  column(4,
-                         selectInput('plotClass', 'Classes to plot', choices = c('Select Class'), multiple = T) 
-                # )
-                
-                ),
+                #   'output.classPlotcheck',
+                  column(4, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
+                # ),
+                ,
                 tabBox(
                   width = 12,
                   tabPanel("Plot", dygraphOutput("plot")),

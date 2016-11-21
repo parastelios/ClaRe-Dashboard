@@ -50,11 +50,17 @@ output$plot <- renderDygraph({
         # the array
         l=rbind(l,c(s,e,w$values[i]))
       }
-      
+      output$classPlotcheck <- reactive({
+        output$textClassSelector <- renderText({
+          paste("'",n,"' is non-numerical, Select class(es)")
+        })
+        return(TRUE)
+      })
+      outputOptions(output, 'classPlotcheck', suspendWhenHidden = FALSE)
       # shading 
       v$classes = unique(l[,3])
       if(is.null(input$plotClass)){
-        g
+        return(g)
       }
       else{
         k = 1
@@ -77,8 +83,8 @@ output$plot <- renderDygraph({
       }
     }
   }
-
-  g
+  
+  return(g)
 })
 
 

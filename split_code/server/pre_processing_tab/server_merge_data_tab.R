@@ -1,22 +1,58 @@
 ###################################################
 #                   Merge Data                    #
-###################################################
+###################################################  
+# dataPre = v$data_pre[,c(setdiff(colnames(v$d_pre), input$excludingPre))]
+# dataTar = v$data_tar[,c(input$targetField,input$targetOption)]
+
 
 # Event of clicking on merge button
-observeEvent(input$merge, {
+observeEvent(input$confirmMerging, {
   predField = input$predictorField
   tarField = input$targetField
-  v$data = mergeData(v$data_pre, v$data_tar, predField, tarField)
+  tarOption = input$targetOption
+  toggleModal(session, "popMerge")
+  v$data = mergeData(v$data_pre, v$data_tar, predField, tarField, tarOption, input$excludingPre)
   v$d_colNA = getColWithNAEntries(v$data)
   renderMergedDataTable(v$data)
 })
 
+# Confirm options for merge
+output$uiMerging <- renderUI({
+  tempPreFieldText <- input$predictorField
+  tempTarFieldText <- input$targetField
+  tempTargetChoiceText <- input$targetOption
+  if(is.null(input$excludingPre)){
+    tempRemoveText <- 'None'
+  }
+  else{
+    tempRemoveText <- input$excludingPre
+  }
+  output$showMergingVar <- renderText({
+    paste("<b>", "Columns to be merged:", "</b>", toString(c(tempTarFieldText, tempPreFieldText)))
+  })
+  output$showTargetChoice <- renderText({
+    paste("<b>", "Selected Target:", "</b>", toString(tempTargetChoiceText)) 
+  })
+  output$showPredictorsRemoved <- renderText({
+    paste("<b>","Predictors to be removed:", "</b>", toString(tempRemoveText))
+  })
+  div(
+    style = "text-align:center",
+    tags$h4(htmlOutput("showMergingVar")),
+    tags$h4(htmlOutput("showTargetChoice")),
+    tags$h4(htmlOutput("showPredictorsRemoved")),
+    bsButton('confirmMerging', 'Confirm Merging', style = "danger")
+  )
+})
 
-mergeData <- function(predictor, target, fieldA, fieldB) {
+
+mergeData <- function(preData, tarData, fieldA, fieldB, target, excludingPredictors) {
   # merge
-  d_merged = merge(predictor, target, by.x=fieldA, by.y=fieldB, all=TRUE)
+  dPre = preData[,c(setdiff(colnames(preData), excludingPredictors))]
+  dTar = tarData[, c(fieldB, target)]
+  d_merged = merge(dPre, dTar, by.x=fieldA, by.y=fieldB, all=TRUE)
   # rename the columns with same name between Predictors and Target
-  sameColNames = intersect(colnames(predictor), colnames(target))
+  sameColNames = intersect(colnames(dPre), colnames(dTar))
   if(is.null(sameColNames) == FALSE){
     for (i in sameColNames) {
       colnames(d_merged)[colnames(d_merged)== i] <- paste0(i,"_Tar")
