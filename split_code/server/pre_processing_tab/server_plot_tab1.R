@@ -2,15 +2,54 @@
 #                   Plot Data                     #
 ###################################################
 
+# checking if target is NonNumerical to enable target's classes
+
+#if it has NA's
+output$classPlotcheckNAs <- reactive({
+  target = tail(colnames(v$data),1) # tail(colnames(v$data),1) is used in order to avoid re-input of target option  
+  isTargetNonNumeric = (!is.numeric(v$data[1,target]) 
+                        && sum(is.na(v$data[,target]))>0
+                        && target %in% input$plotY)
+  output$textClassWithNA <- renderText({
+    n = target
+    if(n=='Please select Target'){
+      paste('Merge for Options')
+    }
+    else{
+      paste("<b>", n, "</b>", ' Non-numeric with NA values, go to', "<i>", 'Manage missing values',"</i>", ' tab')
+    }
+  })
+  return(isTargetNonNumeric)
+})
+outputOptions(output, 'classPlotcheckNAs', suspendWhenHidden = FALSE)
+
+# if it doesn't have NA's
+output$classPlotcheck <- reactive({
+  target = tail(colnames(v$data),1) # tail(colnames(v$data),1) is used in order to avoid re-input of target option
+  isTargetNonNumeric = (!is.numeric(v$data[1,target]) 
+                        && !sum(is.na(v$data[,target]))>0
+                        && target %in% input$plotY)
+  output$textClassSelector <- renderText({
+    n = input$targetOption
+    if(n=='Please select Target'){
+      paste('Merge for Options')
+    }
+    else{
+      paste("Select Target's classes:")
+    }
+  })
+  return(isTargetNonNumeric)
+})
+outputOptions(output, 'classPlotcheck', suspendWhenHidden = FALSE)
+
+
 # Event of clicking on Plot button
 observeEvent(input$preProsPlot, {
   print('pressed')
   x <- input$plotX
   y <- input$plotY
   classes <- input$plotClass
-  # data <- renderMergedDataTable(v$data)
   get_preProsPlot(input$plotType, v$data, x, y, classes)
-  
 })
 
 get_preProsPlot <- function(type, data, varX, varY, class){
@@ -33,9 +72,9 @@ get_preProsPlot <- function(type, data, varX, varY, class){
           return()
         }
         # dygraph:
-        # where the first element/column provides x-axis values and 
+        # where the first element/column provides x-axis values and
         # all subsequent elements/columns provide one or more series of y-values.
-        
+
         # get selected X and Y
         if(varX == 'DataIndex'){
           DataIndex <- seq(from = 1, to = nrow(d))
@@ -44,10 +83,10 @@ get_preProsPlot <- function(type, data, varX, varY, class){
         else{
           target <- cbind(d[c(varX,varY)])
         }
-        
-        g <- dygraph(target)%>% 
+
+        g <- dygraph(target)%>%
           dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
-        
+
         # check which col have NA's
         varWithNA = colnames(target)[colSums(is.na(target)) > 0]
 
@@ -65,15 +104,8 @@ get_preProsPlot <- function(type, data, varX, varY, class){
               # the array
               l=rbind(l,c(s,e,w$values[i]))
             }
-            output$classPlotcheck <- reactive({
-              output$textClassSelector <- renderText({
-                paste(n,'non-numerical, Select classes:')
-              })
-              return(TRUE)
-            })
-            outputOptions(output, 'classPlotcheck', suspendWhenHidden = FALSE)
             # shading
-            v$classes = unique(l[,3])
+            classes = unique(l[,3])
             if(is.null(class)){
               return(g)
             }
@@ -101,18 +133,18 @@ get_preProsPlot <- function(type, data, varX, varY, class){
         return(g)
       })
     }
-    # 
+
     # # Multi Plot
     # if(type == 'multiPlot'){
     #   print('in multi')
-    #   d <- data  
+    #   d <- data
     #   if(is.null(varY)){
     #     return()
     #   }
-    #   
+    # 
     #   result_div <- div()
     #   out <- lapply(varY, function(i){
-    #     
+    # 
     #     if(varX == 'DataIndex'){
     #       DataIndex <- seq(from = 1, to = nrow(d))
     #       target <- cbind(DataIndex, d[i])
@@ -120,7 +152,7 @@ get_preProsPlot <- function(type, data, varX, varY, class){
     #     else{
     #       target <- d[c(varX,i)]
     #     }
-    #     
+    # 
     #     # 1. create a container
     #     #     <div result/>
     #     #         <div for dygraph1/>
@@ -128,20 +160,20 @@ get_preProsPlot <- function(type, data, varX, varY, class){
     #     #
     #     # 2. define output$dygraph1, output$dygraph2
     #     tempName <- paste0("mulplot_dygraph_", i)
-    #     
+    # 
     #     # output$xxx must be defined before uiOutput("xxx") to make it work
     #     output[[tempName]] <- renderDygraph({
-    #       
+    # 
     #       g <- dygraph(target, main = i, group = 'mulplot') %>%
     #         dyOptions(colors = "black")
-    #       
+    # 
     #       # check which col have NA's
     #       varWithNA = colnames(target)[colSums(is.na(target)) > 0]
-    #       
+    # 
     #       # shading for the non-numerical Data
     #       for (n in colnames(target)) {
     #         if (is.numeric(target[1,n]) == F) {
-    #           # create an array with the start and end index of every class 
+    #           # create an array with the start and end index of every class
     #           # using rle() function
     #           w = rle(as.vector(target[,n]))
     #           e=0
@@ -152,16 +184,9 @@ get_preProsPlot <- function(type, data, varX, varY, class){
     #             # the array
     #             l=rbind(l,c(s,e,w$values[i]))
     #           }
-    #           output$classPlotcheck <- reactive({
-    #             output$textClassSelector <- renderText({
-    #               paste(n,' is non-numerical, Select classes to plot:')
-    #             })
-    #             return(TRUE)
-    #           })
-    #           outputOptions(output, 'classPlotcheck', suspendWhenHidden = FALSE)
     #           
-    #           # shading 
-    #           v$classes = unique(l[,3])
+    #           # shading
+    #           classes = unique(l[,3])
     #           if(is.null(class)){
     #             return(g)
     #           }
@@ -173,11 +198,11 @@ get_preProsPlot <- function(type, data, varX, varY, class){
     #                   check = FALSE
     #                 }
     #                 else{
-    #                   check = (x == l[j,3]) 
+    #                   check = (x == l[j,3])
     #                 }
     #                 if (check){
-    #                   g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>% 
-    #                     # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>% 
+    #                   g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
+    #                     # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>%
     #                     dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
     #                 }
     #               }

@@ -177,7 +177,6 @@ observeEvent(input$goConditions2, {
     }
   }
   renderMergedDataTable(v$data)
-  
 })
 
 # checking if conditionvalues is numeric or not 

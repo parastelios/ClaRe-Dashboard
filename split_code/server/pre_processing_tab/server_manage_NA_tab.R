@@ -10,7 +10,6 @@ observeEvent(input$interpolate, {
   method = input$interpolationMethod
   v$data = interpolateColValues(v$data, names, method)
   renderMergedDataTable(v$data)
-  
 })
 
 interpolateColValues <- function(array, colNameList, method) {
@@ -22,7 +21,7 @@ interpolateColValues <- function(array, colNameList, method) {
 
 ########## Repeating ##########
 
-# Event of repeating
+# Event of repeating Numeric column
 observeEvent(input$repeating1, {
   names = input$colWithNAvalues
   v$data = repeatingColValues1(v$data, names)
@@ -36,7 +35,7 @@ repeatingColValues1 <- function(array, colNameList) {
   return(array)
 }
 
-# Event of repeating
+# Event of repeating NonNumeric column
 observeEvent(input$repeating2, {
   names = input$colWithNAvalues
   v$data = repeatingColValues2(v$data, names)

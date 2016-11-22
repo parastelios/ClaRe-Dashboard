@@ -17,7 +17,7 @@ library(imputeTS)
 options(shiny.maxRequestSize = 100*1024^2)
 
 # global settings
-DEBUG_UPLOAD_ON  = F
+DEBUG_UPLOAD_ON  = T
 # predictorFile = './data_arcodium/runPre_sub1.csv'
 predictorFile = './data_arcodium/snowPredictors.csv'
 # targetFile = './data_arcodium/runTar_sub1.csv'
@@ -45,7 +45,7 @@ shinyServer(function(input, output, session) {
   source(file.path("split_code", "server", "pre_processing_tab","server_manage_NA_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","server_save_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","server_other_options_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","server_plot_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","server_plot_tab1.R"),  local = TRUE)$v
   
   source(file.path("split_code", "server", "server_observe_obj.R"),  local = TRUE)$v
   

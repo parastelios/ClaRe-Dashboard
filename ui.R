@@ -292,7 +292,7 @@ dashboardPage(
                              )
                     ),
                     conditionalPanel(
-                      "output.mergecheck1",
+                      "output.isTargetNumeric",
                       column(6,
                              selectizeInput(
                                'theNApolicy', "The target is Numerical, Select NA's Policy",
@@ -327,7 +327,7 @@ dashboardPage(
                              )
                        ),
                     conditionalPanel(
-                      "output.mergecheck2",
+                      "output.isTargetNonNumeric",
                       column(6, 
                              "Non-Numerical target, as a result Repeat NA's Policy should be used",
                              column(12, offset = 4,
@@ -429,56 +429,56 @@ dashboardPage(
             width = 12,
             tabPanel(
               "Plotting",
-              # fluidRow(
-              #   #plots
-              #   column(2,
-              #     radioButtons('plotType', 'Select Plot',
-              #                  c(Simple='simplePlot',
-              #                    Multiple='multiPlot',
-              #                    Correlation='corrPlot'),
-              #                  selected = 'simplePlot')
-              #   ),
-              #   # column(4,
-              #   #   selectInput('plotType', 'Select Plot', choices = c('Simple', 'Multiple', 'Correlation'), multiple = F)
-              #   # )
-              #   column(3,
-              #          selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
-              #   ),
-              #   column(3,
-              #          selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
-              #   ),
-              #   conditionalPanel(
-              #     'output.classPlotcheck',
-              #     column(3, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
-              #   ),
-              #   column(3, align = 'right', offset = 8,
-              #          actionButton('preProsPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
-              #   ),
-              #   tabBox(
-              #         width = 12,
-              #      dygraphOutput("plot")
-              #      )
-              # )
               fluidRow(
                 #plots
-                column(4,
-                    selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+                column(2,
+                  radioButtons('plotType', 'Select Plot',
+                               c(Simple='simplePlot',
+                                 Multiple='multiPlot',
+                                 Correlation='corrPlot'),
+                               selected = 'simplePlot')
                 ),
-                column(4,
-                    selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+                column(3,
+                       selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
                 ),
-                # conditionalPanel(
-                #   'output.classPlotcheck',
-                  column(4, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
-                # ),
-                ,
-                tabBox(
-                  width = 12,
-                  tabPanel("Plot", dygraphOutput("plot")),
-                  tabPanel("Multi-plot", uiOutput("mulplot")),
-                  tabPanel("Correlation", uiOutput("corplot"))
-                )
+                column(3,
+                       selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+                ),
+                conditionalPanel(
+                  'output.classPlotcheckNAs',
+                  column(3, h4(htmlOutput('textClassWithNA')))
+                ),
+                conditionalPanel(
+                  'output.classPlotcheck',
+                  column(3, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
+                ),
+                column(1, align = 'right',
+                       actionButton('preProsPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
+                ),
+                box(width = 12,
+                   dygraphOutput("plot")
+                   )
               )
+              # fluidRow(
+              #   #plots
+              #   column(4,
+              #       selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+              #   ),
+              #   column(4,
+              #       selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+              #   ),
+              #   # conditionalPanel(
+              #   #   'output.classPlotcheck',
+              #     column(4, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
+              #   # ),
+              #   ,
+              #   tabBox(
+              #     width = 12,
+              #     tabPanel("Plot", dygraphOutput("plot")),
+              #     tabPanel("Multi-plot", uiOutput("mulplot")),
+              #     tabPanel("Correlation", uiOutput("corplot"))
+              #   )
+              # )
             ),
             # allow x-flow for DT:dataTable
             shinyjs::inlineCSS(list(

@@ -7,7 +7,8 @@ observe({
   d_preCol <- colnames(v$data_pre)
   d_tarCol <- colnames(v$data_tar)
   d_Col <- colnames(v$data)
-
+  target <- tail(colnames(v$data),1)
+  
   ################ Pre-processing tab ################
   ###########  date/time tab  ###########
   updateSelectInput(session, "preTimeCol", choices = d_preCol)
@@ -21,7 +22,7 @@ observe({
   ############## plot tab ##############
   updateSelectInput(session, "plotY", choices = d_Col)
   updateSelectInput(session, "plotX", choices = c("DataIndex", d_Col))
-  updateSelectInput(session, "plotClass", choices = v$classes)
+  updateSelectInput(session, "plotClass", choices = levels(v$data[,target]))
   ########## other optopns tab #########
   # updateSelectInput(session, "excludingVar", choices = d_Col)
   # this will refresh all components

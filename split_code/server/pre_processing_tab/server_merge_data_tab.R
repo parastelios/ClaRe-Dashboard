@@ -1,9 +1,6 @@
 ###################################################
 #                   Merge Data                    #
 ###################################################  
-# dataPre = v$data_pre[,c(setdiff(colnames(v$d_pre), input$excludingPre))]
-# dataTar = v$data_tar[,c(input$targetField,input$targetOption)]
-
 
 # Event of clicking on merge button
 observeEvent(input$confirmMerging, {
@@ -33,6 +30,16 @@ output$uiMerging <- renderUI({
   output$showTargetChoice <- renderText({
     paste("<b>", "Selected Target:", "</b>", toString(tempTargetChoiceText)) 
   })
+  if(input$targetOption == input$targetField){
+    output$targetWarning <- renderText({
+      paste("<b>", 'Warning: Target is the same with the target Merge-field !', "</b>")
+    })
+  }
+  else{
+    output$targetWarning <- renderText({
+      paste('')
+    })
+  }
   output$showPredictorsRemoved <- renderText({
     paste("<b>","Predictors to be removed:", "</b>", toString(tempRemoveText))
   })
@@ -40,6 +47,7 @@ output$uiMerging <- renderUI({
     style = "text-align:center",
     tags$h4(htmlOutput("showMergingVar")),
     tags$h4(htmlOutput("showTargetChoice")),
+    tags$h4(htmlOutput("targetWarning")),
     tags$h4(htmlOutput("showPredictorsRemoved")),
     bsButton('confirmMerging', 'Confirm Merging', style = "danger")
   )
@@ -93,23 +101,15 @@ getColWithNAEntries <- function(array) {
   return(result)
 }
 
-# checking if cloWithNAvalues is numeric or not to use it for interpolate or repeating
-output$mergecheck1 <- reactive({
-  l1 = input$colWithNAvalues
-  a1 = is.numeric(v$target[1,l1])
-  # print(a1)
-  # print("1")
-  return(a1)
+# checking if target is numeric or not to use it for interpolate or repeating
+output$isTargetNumeric <- reactive({
+  isTargetNumeric = is.numeric(v$data[1,input$targetOption])
+  return(isTargetNumeric)
 })
-outputOptions(output, 'mergecheck1', suspendWhenHidden = FALSE)
+outputOptions(output, 'isTargetNumeric', suspendWhenHidden = FALSE)
 
-output$mergecheck2 <- reactive({
-  l2 = input$colWithNAvalues
-  a2 = ! is.numeric(v$target[1,l2])
-  # print(a2)
-  # print("2")
-  return(a2)
+output$isTargetNonNumeric <- reactive({
+  isTargetNonNumeric = !is.numeric(v$data[1,input$targetOption])
+  return(isTargetNonNumeric)
 })
-outputOptions(output, 'mergecheck2', suspendWhenHidden = FALSE)
-
-
+outputOptions(output, 'isTargetNonNumeric', suspendWhenHidden = FALSE)
