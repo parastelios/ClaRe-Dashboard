@@ -17,7 +17,7 @@ library(imputeTS)
 options(shiny.maxRequestSize = 100*1024^2)
 
 # global settings
-DEBUG_UPLOAD_ON  = T
+DEBUG_UPLOAD_ON  = F
 # predictorFile = './data_arcodium/runPre_sub1.csv'
 predictorFile = './data_arcodium/snowPredictors.csv'
 # targetFile = './data_arcodium/runTar_sub1.csv'

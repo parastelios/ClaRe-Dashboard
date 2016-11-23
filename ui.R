@@ -265,19 +265,6 @@ dashboardPage(
                        )
               )
             ),
-            #     box(width = 6,
-            #       column(10,
-            #         selectInput('predictorField', 'Predictor Field', choices = c('Please select a field to merge upon'), multiple = F)
-            #       ),
-            #       column(10,
-            #         selectInput('targetField', 'Target Field', choices = c('Please select a field to merge upon'), multiple = F)
-            #       ),
-            #       column(width = 2, onset = 2, actionButton("merge", "Merge"))
-            #     ),
-            #       
-            #     )
-            #   )
-            # ),
             tabPanel(
               "Manage missing values",
               fluidRow(
@@ -455,9 +442,24 @@ dashboardPage(
                 column(1, align = 'right',
                        actionButton('preProsPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
                 ),
-                box(width = 12,
-                   dygraphOutput("plot")
-                   )
+                conditionalPanel(
+                  'output.simplePlotCheck',
+                  box(width = 12,
+                      dygraphOutput("plot")
+                  )
+                ),
+                conditionalPanel(
+                  'output.multiPlotCheck',
+                  box(width = 12,
+                      uiOutput("multi")
+                  )
+                ),
+                conditionalPanel(
+                  'output.corrPlotCheck',
+                  box(width = 12,
+                      uiOutput("corr")
+                  )
+                )
               )
               # fluidRow(
               #   #plots
