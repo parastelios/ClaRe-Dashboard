@@ -11,6 +11,37 @@ observeEvent(input$confirmMerging, {
   v$data = mergeData(v$data_pre, v$data_tar, predField, tarField, tarOption, input$excludingPre)
   v$d_colNA = getColWithNAEntries(v$data)
   renderMergedDataTable(v$data)
+ 
+  # Updating model options(Class/Regres)
+  # predictor rate
+  preLocalSR <- 1/diff(v$data_pre[,input$predictorField]/1000)
+  meanPreSR <- signif(mean(preLocalSR), 3)
+  v$preRate <- meanPreSR
+  
+  # target rate
+  tarLocalSR <- 1/diff(v$data_tar[,input$targetField]/1000)
+  meanTarSR <- signif(mean(tarLocalSR), 3)
+  v$tarRate <- meanTarSR
+  
+  # update the regression options after merge
+  updateNumericInput(session, "tarSampleRateReg",
+                     value = v$tarRate, 
+                     min = 0, max = v$preRate, step = 0.005)  
+  maxWinReg <- v$preRate*(input$numOfSamplesReg)
+  updateSliderInput(session, "maxWindowReg",
+                    value = maxWinReg,
+                    min = 0, max = 10*(maxWinReg), step = 5)
+  
+  # update the classification options after merge
+  updateNumericInput(session, "tarSampleRateClass", 
+                     # label = 'Give Target sampling rate:',
+                     value = v$tarRate, 
+                     min = 0, max = v$preRate, step = 0.005)
+  maxWinClass <- v$preRate*(input$numOfSamplesClass)
+  updateSliderInput(session, "maxWindowClass",
+                    value = maxWinClass,
+                    min = 0, max = 10*(maxWinClass), step = 5)
+  
 })
 
 # Confirm options for merge
@@ -49,8 +80,9 @@ output$uiMerging <- renderUI({
     tags$h4(htmlOutput("showTargetChoice")),
     tags$h4(htmlOutput("targetWarning")),
     tags$h4(htmlOutput("showPredictorsRemoved")),
-    bsButton('confirmMerging', 'Confirm Merging', style = "danger")
+    bsButton('confirmMerging', 'Confirm Merging', style = "primary")
   )
+  
 })
 
 
@@ -113,3 +145,4 @@ output$isTargetNonNumeric <- reactive({
   return(isTargetNonNumeric)
 })
 outputOptions(output, 'isTargetNonNumeric', suspendWhenHidden = FALSE)
+

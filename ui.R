@@ -30,8 +30,8 @@ dashboardPage(
     )),
     sidebarMenu(
       menuItem("Import", tabName = "import", icon = icon("file-o")),
-      menuItem("Pre-processing", tabName = "preProcessing", icon = icon("cog")),
-      
+      menuItem("Pre-processing", tabName = "preProcessing", icon = icon("cogs")),
+      menuItemOutput('selectmodeling'),
       menuItem("About", tabName = "about", icon = icon("info-circle"))
     )
   ),
@@ -56,10 +56,8 @@ dashboardPage(
       ###################### import  ######################
       #####################################################
       tabItem(
-        
         tabName = "import",
         fluidRow(
-          
           box(
             width = 6,
             title = "Upload Predictors Data",
@@ -172,7 +170,7 @@ dashboardPage(
             id = "preProTabs",
             width = 12,
             tabPanel(
-              "Date/Time parser",
+              "Date/Time parser", icon = icon("clock-o"),
               # date time buttons
               fluidRow(
                 # allow x-flow for DT:dataTable
@@ -237,7 +235,7 @@ dashboardPage(
               )
             ),
             tabPanel(
-              "Merge",
+              "Merge", icon = icon("compress"),
               fluidRow(
                 # merge data
                 box(width = 4, 
@@ -260,13 +258,13 @@ dashboardPage(
                 ),
                 box(width = 4, 
                     title = '3. Create merged Dataset:',
-                    actionButton('merge', 'Go Merge', class="goButton", icon = icon("arrow-circle-right")),
+                    actionButton('merge', 'Merge', class="goButton", icon = icon("arrow-circle-right")),
                     bsModal("popMerge", "Merging Choices", "merge", size = "large", uiOutput("uiMerging"))
                        )
               )
             ),
             tabPanel(
-              "Manage missing values",
+              "Manage missing values", icon = icon("indent"),
               fluidRow(
                 # interopolating/reapeting
                 box(width = 12, 
@@ -326,7 +324,7 @@ dashboardPage(
                 )
             ),
             tabPanel(
-              "Other Options",
+              "Other Options", icon = icon("tasks"),
               fluidRow(
                 # others like normalizing etc.
                 shinyjs::inlineCSS(list(
@@ -354,7 +352,7 @@ dashboardPage(
                 ),
                 box(
                   width = 4,
-                  height = "200px",
+                  # height = "200px",
                   title = "Data Normalization",
                   align = 'right',
                   actionButton('goNormalizing', 'Go', class="goButton", icon = icon("arrow-circle-right"))
@@ -415,7 +413,7 @@ dashboardPage(
             # plot and data review
             width = 12,
             tabPanel(
-              "Plotting",
+              "Plotting", icon = icon("bar-chart"),
               fluidRow(
                 #plots
                 column(2,
@@ -487,10 +485,10 @@ dashboardPage(
               ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
             )),
             tabPanel(
-              "Pre-Processed Data", uiOutput("dataTable")
+              "Pre-Processed Data",icon = icon("table"), uiOutput("dataTable")
             ),
             tabPanel(
-              "Summary", verbatimTextOutput("dataSummary")
+              "Summary",icon = icon("file-text-o"), verbatimTextOutput("dataSummary")
             ),
             tabPanel(
               tagList(shiny::icon("download"), "Save"), 
@@ -506,7 +504,100 @@ dashboardPage(
       ),
       #</preprocessing>
       
+      ######################################################
+      ####                    Model                     ####
+      ######################################################
+      tabItem(
+        tabName = 'model',
+        fluidRow(
+          box(width = 12,
+              title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i> 
+                            For more options choose your target variable'),
+              h4(
+              HTML('Go to:'),
+              HTML('<i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    <i>"Choose your target variable"</i>')
+              )
+          )
+        )
+      ),
+      tabItem(
+        tabName = 'regression',
+        fluidRow(
+          box(width = 4,
+              title = 'Regresion',
+              column(12,
+                     h5(strong('Predictors sampling rate is:')),
+                     box(width = 5,
+                         align = 'center',
+                         h4(uiOutput('preSampleRateReg'))
+                     )
+                     
+              ),
+              column(8,
+                     # h5(strong('Give Target sampling rate:')),
+                     numericInput('tarSampleRateReg',
+                                  label = 'Give Target sampling rate:',
+                                  min = 0, max = 1,
+                                  value = 0, step = 0.005)
+              ),
+              column(8,
+                     # h5(strong('Choose Number of samples:')),
+                     numericInput('numOfSamplesReg',
+                                  label = 'Choose Number of samples:',
+                                  value = 10
+                                  )
+              ),
+              column(8,
+                     sliderInput("maxWindowReg", "Choose Max window size:",
+                                 min = 0, max = 20, value = 15)
+              ),
+              column(12, align = 'right',
+                     actionButton('goReg', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+              )
+          )
+        )
+      ),
+      tabItem(
+        tabName = 'classification',
+        fluidRow(
+          box(width = 4,
+              title = 'Classification',
+              column(12,
+                     h5(strong('Predictors sampling rate is:')),
+                     box(width = 5,
+                         align = 'center',
+                         h4(uiOutput('preSampleRateClass'))
+                     )
+                     
+              ),
+              column(8,
+                     # Target sampling rate:
+                     numericInput('tarSampleRateClass',
+                                  label = 'Give Target sampling rate:',
+                                  min = 0, max = 1,
+                                  value = 0, step = 0.005)
+              ),
+              column(8,
+                     # h5(strong('Choose Number of samples:')),
+                     numericInput('numOfSamplesClass',
+                                  label = 'Choose Number of samples:',
+                                  value = 10
+                                  )
+              ),
+              column(8,
+                     sliderInput("maxWindowClass", "Choose Max window size:",
+                                 min = 0, max = 20, value = 15)
+              ),
+              column(12, align = 'right',
+                     actionButton('goClass', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+              )
+          )
+        )
+      ),
       
+      #</model>  
       ######################################################
       ######################   About  ######################
       ######################################################

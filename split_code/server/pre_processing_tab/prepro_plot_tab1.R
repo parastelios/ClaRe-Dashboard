@@ -45,7 +45,6 @@ outputOptions(output, 'classPlotcheck', suspendWhenHidden = FALSE)
 
 # Event of clicking on Plot button
 observeEvent(input$preProsPlot, {
-  print('pressed')
   x <- input$plotX
   y <- input$plotY
   classes <- input$plotClass
@@ -57,7 +56,6 @@ observeEvent(input$preProsPlot, {
 
 get_preProsPlot <- function(type, data, varX, varY, class){
   
-  print('in fun')
   colorMax = 9
   colors = RColorBrewer::brewer.pal(colorMax, "Pastel1")
   
@@ -83,7 +81,6 @@ get_preProsPlot <- function(type, data, varX, varY, class){
     # Simple Plot
     # if(type == 'simplePlot'){
       output$plot <- renderDygraph({
-        print('in simple')
         d <- data
         if (is.null(d)
             ||
@@ -162,16 +159,39 @@ get_preProsPlot <- function(type, data, varX, varY, class){
         return()
       }
       
+      
+      target_col = tail(colnames(d),1)
+      nonNumericTarget = (!is.numeric(d[1,target_col]) 
+                            && !sum(is.na(d[,target_col]))>0
+                            && target_col %in% varY)
+      
+      
       result_div <- div()
       out <- lapply(varY, function(i){
-        
-        if(varX == 'DataIndex'){
-          DataIndex <- seq(from = 1, to = nrow(d))
-          target <- cbind(DataIndex, d[i])
+        if(i==target_col && nonNumericTarget){
+          return()
         }
         else{
-          target <- d[c(varX,i)]
+          if(nonNumericTarget){
+            if(varX == 'DataIndex'){
+              DataIndex <- seq(from = 1, to = nrow(d))
+              target <- cbind(DataIndex, d[c(i,target_col)])
+            }
+            else{
+              target <- d[c(varX,i,target_col)]
+            }  
+          }
+          else{
+            if(varX == 'DataIndex'){
+              DataIndex <- seq(from = 1, to = nrow(d))
+              target <- cbind(DataIndex, d[i])
+            }
+            else{
+              target <- d[c(varX,i)]
+            }
+          }
         }
+        
         
         # 1. create a container
         #     <div result/>
@@ -192,7 +212,7 @@ get_preProsPlot <- function(type, data, varX, varY, class){
           # shading for the non-numerical Data
           for (n in colnames(target)) {
             if (is.numeric(target[1,n]) == F) {
-              # create an array with the start and end index of every class 
+              # create an array with the start and end index of every class
               # using rle() function
               w = rle(as.vector(target[,n]))
               e=0
@@ -203,8 +223,8 @@ get_preProsPlot <- function(type, data, varX, varY, class){
                 # the array
                 l=rbind(l,c(s,e,w$values[i]))
               }
-              
-              # shading 
+
+              # shading
               classes = unique(l[,3])
               if(is.null(input$plotClass)){
                 return(g)
@@ -217,11 +237,11 @@ get_preProsPlot <- function(type, data, varX, varY, class){
                       check = FALSE
                     }
                     else{
-                      check = (x == l[j,3]) 
+                      check = (x == l[j,3])
                     }
                     if (check){
-                      g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>% 
-                        # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>% 
+                      g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
+                        # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>%
                         dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
                     }
                   }
@@ -244,24 +264,24 @@ get_preProsPlot <- function(type, data, varX, varY, class){
   # corelation plots
   output$corr <- renderUI({
     
-    d <- v$data
-    if(is.null(input$plotY))
+    d <- data
+    if(is.null(varY))
       return()
     
     result_div <- div()
     
-    dop <- lapply(input$plotY, function(i){
+    dop <- lapply(varY, function(i){
       
-      if(input$plotX == 'DataIndex'){
+      if(varX == 'DataIndex'){
         DataIndex <- seq(from = 1, to = nrow(d))
         target <- cbind(DataIndex, d[i])
       }
       else{
-        target <- d[c(input$plotX,i)]
+        target <- d[c(varX,i)]
       }
       tempName <- paste0("corplot_ggplot_", i)
       output[[tempName]] <- renderPlot({
-        ggplot(target, aes_string(x = input$plotX, y = i)) +
+        ggplot(target, aes_string(x = varX, y = i)) +
           geom_point() +
           geom_smooth(method = "lm", se = F) +
           ggtitle(i)

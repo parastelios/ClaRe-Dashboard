@@ -17,7 +17,7 @@ library(imputeTS)
 options(shiny.maxRequestSize = 100*1024^2)
 
 # global settings
-DEBUG_UPLOAD_ON  = F
+DEBUG_UPLOAD_ON  = T
 # predictorFile = './data_arcodium/runPre_sub1.csv'
 predictorFile = './data_arcodium/snowPredictors.csv'
 # targetFile = './data_arcodium/runTar_sub1.csv'
@@ -40,13 +40,13 @@ shinyServer(function(input, output, session) {
   
   # Loading the tabs to server.R from the split_code file
   source(file.path("split_code", "server", "server_import_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","server_datetime_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","server_merge_data_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","server_manage_NA_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","server_save_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","server_other_options_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","server_plot_tab1.R"),  local = TRUE)$v
-  
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_datetime_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_merge_data_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_manage_NA_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_save_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_other_options_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_plot_tab1.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "server_model_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "server_observe_obj.R"),  local = TRUE)$v
   
   # Automatically stop a Shiny app when closing the browser tab (http://deanattali.com/blog/advanced-shiny-tips/)
