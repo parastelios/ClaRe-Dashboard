@@ -52,6 +52,7 @@ observeEvent(input$confirmMerging,{
                     min = 0, max = 10*(maxWinClass), step = 5)
   v$PParameterClass <- parameterFinder(v$AIData$Sampling.Rate, v$tarRate, input$maxWindowClass)
   print(v$PParameterClass)
+  print(summary(v$data_tar[,input$targetOption]))
 })
 ##################
 # Regression tab #
@@ -78,7 +79,7 @@ observeEvent(input$numOfSamplesReg,{
 
 # Running Accordion:
 observeEvent(input$goReg,{
-  dataset <- embedded.CCF.FS(v$data_tar[,input$targetField], v$data_pre, v$AIData, v$PParameterReg)
+  dataset <- embedded.CCF.FS(v$data_tar[,input$targetOption], v$data_pre, v$AIData, v$PParameterReg)
   
 })
 
@@ -108,6 +109,6 @@ observeEvent(input$numOfSamplesClass,{
 
 # Running Accordion:
 observeEvent(input$goClass,{
-  dataset <- embedded.IG.FS(v$data_tar[,input$targetField], v$data_pre, v$AIData, v$PParameterClass)
+  dataset <- embedded.IG.FS(v$data_tar[,input$targetOption], v$data_pre, v$AIData, v$PParameterClass)
 })
 
