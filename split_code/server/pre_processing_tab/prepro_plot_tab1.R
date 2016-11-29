@@ -47,11 +47,9 @@ outputOptions(output, 'classPlotcheck', suspendWhenHidden = FALSE)
 observeEvent(input$preProsPlot, {
   x <- input$plotX
   y <- input$plotY
-  classes <- input$plotClass
+  # classes <- input$plotClass
   get_preProsPlot(input$plotType, v$data, x, y, classes)
 })
-
-
 
 
 get_preProsPlot <- function(type, data, varX, varY, class){
@@ -124,12 +122,12 @@ get_preProsPlot <- function(type, data, varX, varY, class){
             }
             # shading
             classes = unique(l[,3])
-            if(is.null(class)){
+            if(is.null(input$plotClass)){
               return(g)
             }
             else{
               k = 1
-              for(x in class){
+              for(x in input$plotClass){
                 for(j in 1:nrow(l)){
                   if(is.na(l[j,3]) | is.na(x)){
                     check = FALSE
@@ -205,6 +203,7 @@ get_preProsPlot <- function(type, data, varX, varY, class){
         output[[tempName]] <- renderDygraph({
           
           g <- dygraph(target, main = i, group = 'mulplot') %>%
+            dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)%>%
             dyOptions(colors = "black")
           # check which col have NA's
           varWithNA = colnames(target)[colSums(is.na(target)) > 0]
