@@ -45,9 +45,9 @@ output$uiMerging <- renderUI({
   })
   div(
     style = "text-align:center",
+    tags$h4(htmlOutput("targetWarning")),
     tags$h4(htmlOutput("showMergingVar")),
     tags$h4(htmlOutput("showTargetChoice")),
-    tags$h4(htmlOutput("targetWarning")),
     tags$h4(htmlOutput("showPredictorsRemoved")),
     bsButton('confirmMerging', 'Confirm Merging', style = "primary")
   )
@@ -104,13 +104,13 @@ getColWithNAEntries <- function(array) {
 
 # checking if target is numeric or not to use it for interpolate or repeating
 output$isTargetNumeric <- reactive({
-  isTargetNumeric = is.numeric(v$data[1,input$targetOption])
+  isTargetNumeric = is.numeric(v$data[,ncol(v$data)])
   return(isTargetNumeric)
 })
 outputOptions(output, 'isTargetNumeric', suspendWhenHidden = FALSE)
 
 output$isTargetNonNumeric <- reactive({
-  isTargetNonNumeric = !is.numeric(v$data[1,input$targetOption])
+  isTargetNonNumeric = !is.numeric(v$data[,ncol(v$data)])
   return(isTargetNonNumeric)
 })
 outputOptions(output, 'isTargetNonNumeric', suspendWhenHidden = FALSE)

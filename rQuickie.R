@@ -53,13 +53,12 @@ analyseIndependentData <- function(data)
 	localSR <- 1/(diff(timeStamps)/1000)
 	#Sampling is the process of converting a signal (for example, a function of continuous time or space)
 	#into a numeric sequence (a function of discrete time or space)
-	modeSR = as.numeric(Mode(localSR))
 	medianSR = median(localSR)
 	meanSR = round(mean(localSR),digits = getndp(medianSR))
-	ifelse((meanSR == modeSR && modeSR == medianSR), stability <- "yes", stability <- "no")
+	ifelse((meanSR == medianSR), stability <- "yes", stability <- "no")
 	
 	#ouput of the function
-	output <- list(names(data),meanSR,stability,n)
+	output <- list(names(data),medianSR,stability,n)
 	names(output) <- c('Variables.Names', 'Sampling.Rate', 'Stable.Sampling.Rate','Variables.nrow')
 	return(output)
 }

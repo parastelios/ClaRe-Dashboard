@@ -169,71 +169,71 @@ dashboardPage(
           tabBox( 
             id = "preProTabs",
             width = 12,
-            tabPanel(
-              "Date/Time parser", icon = icon("clock-o"),
-              # date time buttons
-              fluidRow(
-                # allow x-flow for DT:dataTable
-                shinyjs::inlineCSS(list(
-                  ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-                )),
-                align = 'center',
-                box(
-                  width = 6,
-                  title = "Predictor's Timestamp", 
-                  column(4,
-                      selectInput('preTimeCol', 
-                                  'Chose Column with timestamp:', 
-                                  choices = c('column'), 
-                                  multiple = F
-                      )
-                  ),
-                  column(8,
-                         uiOutput("predictor1Table")
-                         ),
-                  column(12,
-                         align = 'left',
-                         h5(strong('Timestamp Preview: ')),
-                         box(
-                           width = 12,
-                           align = 'center',
-                           h4(uiOutput('preTimestamp'))
-                         )
-                  ),
-                  column(6,
-                        h5('If integer convert to Timestamp'),
-                        actionButton('preTimeConvert','Convert')
-                  )
-                ),
-                box(
-                  width = 6,
-                  title = "Target's Timestamp", 
-                  column(4,
-                         selectInput('tarTimeCol', 
-                                     'Chose Column with timestamp:', 
-                                     choices = c('column'), 
-                                     multiple = F
-                         )
-                  ),
-                  column(8,
-                         uiOutput("target1Table")
-                        ),
-                  column(12,
-                         align = 'left',
-                         h5(strong('Timestamp Preview: ')),
-                         box(
-                           width = 12,
-                           align = 'center',
-                           h4(uiOutput('tarTimestamp'))
-                         )
-                  ),
-                  column(6,
-                         h5('If integer convert to Timestamp'),
-                         actionButton('preTimeConvert','Convert')
-                  )
-                )
-              )
-            ),
+#             tabPanel(
+#               "Date/Time parser", icon = icon("clock-o"),
+#               # date time buttons
+#               fluidRow(
+#                 # allow x-flow for DT:dataTable
+#                 shinyjs::inlineCSS(list(
+#                   ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+#                 )),
+#                 align = 'center',
+#                 box(
+#                   width = 6,
+#                   title = "Predictor's Timestamp", 
+#                   column(4,
+#                       selectInput('preTimeCol', 
+#                                   'Chose Column with timestamp:', 
+#                                   choices = c('column'), 
+#                                   multiple = F
+#                       )
+#                   ),
+#                   column(8,
+#                          uiOutput("predictor1Table")
+#                          ),
+#                   column(12,
+#                          align = 'left',
+#                          h5(strong('Timestamp Preview: ')),
+#                          box(
+#                            width = 12,
+#                            align = 'center',
+#                            h4(uiOutput('preTimestamp'))
+#                          )
+#                   ),
+#                   column(6,
+#                         h5('If integer convert to Timestamp'),
+#                         actionButton('preTimeConvert','Convert')
+#                   )
+#                 ),
+#                 box(
+#                   width = 6,
+#                   title = "Target's Timestamp", 
+#                   column(4,
+#                          selectInput('tarTimeCol', 
+#                                      'Chose Column with timestamp:', 
+#                                      choices = c('column'), 
+#                                      multiple = F
+#                          )
+#                   ),
+#                   column(8,
+#                          uiOutput("target1Table")
+#                         ),
+#                   column(12,
+#                          align = 'left',
+#                          h5(strong('Timestamp Preview: ')),
+#                          box(
+#                            width = 12,
+#                            align = 'center',
+#                            h4(uiOutput('tarTimestamp'))
+#                          )
+#                   ),
+#                   column(6,
+#                          h5('If integer convert to Timestamp'),
+#                          actionButton('preTimeConvert','Convert')
+#                   )
+#                 )
+#               )
+#             ),
             tabPanel(
               "Merge", icon = icon("compress"),
               fluidRow(
@@ -281,7 +281,7 @@ dashboardPage(
                       column(6,
                              selectizeInput(
                                'theNApolicy', "The target is Numerical, Select NA's Policy",
-                               choices = c('Repeating', 'Interpolation'),
+                               choices = c('Interpolation', 'Repeating'),
                                multiple = F
                              ),
                              conditionalPanel(
