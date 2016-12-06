@@ -110,16 +110,22 @@ embedded.Cor.FS <- function(DData, IData, AIData, PParameter)
 
 whiteNoise <- function(x)
 {
+  print(x)
   n <- length(x)
   gam <- acf(x, type = "covariance",plot=F, na.action=na.pass)
+  summary(gam)
+  print(gam)
   gam0 <- gam$acf[1]
+  print(gam0)
   ILAM <- spec.pgram(x, taper = 0, fast = FALSE,plot=F)
   ILAM <- ILAM$spec
   T <- length(ILAM)
   P2 <- (T^(-1)) * (sum(ILAM^2))
   MN <- (P2/gam0^2) - 1
   tMN <- sqrt(T) * (MN - 1)
+  print(tMN)
   pval <- pnorm(tMN, mean = 0, sd = 2, lower.tail = FALSE)
+  print(pval)
   test <- pval * 2
   if (test > 1) 
     test <- 2 - test
@@ -135,6 +141,7 @@ embedded.CCF.FS <- function(DData, IData, AIData, PParameter)
   aStart <- 0
   indexFeatures <- 2
   aTarget <- DData
+  # print(summary(aTarget))
   validation <- whiteNoise(aTarget)
   if(validation >= 0.95)
     print(paste("Target attribute considered white noise: p-value = ",validation,sep=""))

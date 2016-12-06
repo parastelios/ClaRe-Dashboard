@@ -4,6 +4,8 @@
 
 # Event of clicking on merge button
 observeEvent(input$confirmMerging, {
+  print('merge')
+  print(input$maxWindowClass)
   predField = input$predictorField
   tarField = input$targetField
   tarOption = input$targetOption
@@ -101,17 +103,3 @@ getColWithNAEntries <- function(array) {
   result = colnames(array)[colSums(is.na(array)) > 0]
   return(result)
 }
-
-# checking if target is numeric or not to use it for interpolate or repeating
-output$isTargetNumeric <- reactive({
-  isTargetNumeric = is.numeric(v$data[,ncol(v$data)])
-  return(isTargetNumeric)
-})
-outputOptions(output, 'isTargetNumeric', suspendWhenHidden = FALSE)
-
-output$isTargetNonNumeric <- reactive({
-  isTargetNonNumeric = !is.numeric(v$data[,ncol(v$data)])
-  return(isTargetNonNumeric)
-})
-outputOptions(output, 'isTargetNonNumeric', suspendWhenHidden = FALSE)
-

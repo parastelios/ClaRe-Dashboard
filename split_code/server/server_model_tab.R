@@ -16,11 +16,7 @@ output$selectmodeling <- renderMenu({
 
 # event of merging creates options for the models (regression/classification)
 observeEvent(input$confirmMerging,{
-  # Load Accordion code (Class/Regres)
-  source('rQuickie.R')
-  source('featureSelection.R')
-  source('featureConstruction.R')
-  
+  # print(input$maxWindowClass)
   # Calculate sampling rate of predictors
   v$AIData <- analyseIndependentData(v$data_pre)
   v$AIData$Stable.Sampling.Rate <- "yes"
@@ -36,10 +32,10 @@ observeEvent(input$confirmMerging,{
   updateNumericInput(session, "tarSampleRateReg",
                      value = v$tarRate, 
                      min = 0, max = v$preRate, step = 0.005)  
-  maxWinReg <- v$preRate*(input$numOfSamplesReg)
-  updateSliderInput(session, "maxWindowReg",
-                    value = maxWinReg,
-                    min = 0, max = 10*(maxWinReg), step = 5)
+  v$maxWinReg <- v$preRate*(input$numOfSamplesReg)
+  updateNumericInput(session, "maxWindowReg",
+                    value = v$maxWinReg,
+                    min = 0, max = 10*(v$maxWinReg), step = 1)
   v$PParameterReg <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateReg, input$maxWindowReg)
   
   # update the classification options after merge
@@ -47,10 +43,10 @@ observeEvent(input$confirmMerging,{
                      # label = 'Give Target sampling rate:',
                      value = v$tarRate, 
                      min = 0, max = v$preRate, step = 0.005)
-  maxWinClass <- v$preRate*(input$numOfSamplesClass)
-  updateSliderInput(session, "maxWindowClass",
-                    value = maxWinClass,
-                    min = 0, max = 10*(maxWinClass), step = 5)
+  v$maxWinClass <- v$preRate*(input$numOfSamplesClass)
+  updateNumericInput(session, "maxWindowClass",
+                    value = v$maxWinClass,
+                    min = 0, max = 10*v$maxWinClass, step = 1)
   
   # calculate the parameters that go into Accordion
   v$PParameterClass <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateClass, input$maxWindowClass)
@@ -73,11 +69,16 @@ output$preSampleRateReg <- renderText({
 
 # Adjusting max window size
 observeEvent(input$numOfSamplesReg,{
-  maxWinReg <- v$preRate*(input$numOfSamplesReg)
-  updateSliderInput(session, "maxWindowReg",
-                    value = maxWinReg,
-                    min = 0, max = 10*(maxWinReg), step = 5)
-  })
+  # Check preRate
+  if(is.null(v$preRate)) {
+    v$preRate <- 1
+  }
+  # print(v$preRate)
+  v$maxWinReg <- v$preRate*(input$numOfSamplesReg)
+  updateNumericInput(session, "maxWindowReg",
+                     value = v$maxWinReg,
+                     min = 0, max = 10*v$maxWinReg, step = 1)
+})
 
 # Running Accordion:
 observeEvent(input$goReg,{
@@ -96,10 +97,17 @@ observeEvent(input$goReg,{
   aTarIndex[length(aTarIndex)]
   
   # Run accordion for lag regression
-  features <- embedded.CCF.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg)
+  if(input$regressionMethod == 'linearReg'){
+    print('linear')
+    features <- embedded.Cor.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg)
+  }
+  else{
+    print('lag')
+    features <- embedded.CCF.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg) 
+  }
   # TODO: if condition to allow to change the regression to linear regression
   # Run accordion for linear regression
-  #features <- embedded.Cor.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg)
+  #
   print(summary(features))
   
   # build regression model
@@ -109,6 +117,20 @@ observeEvent(input$goReg,{
   print(summary(predict(linearModel)))
   
 })
+
+# checking if target has NAs
+output$targetStillWithNAReg <- reactive({
+  targetStillWithNAReg = (anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetStillWithNAReg)
+})
+outputOptions(output, 'targetStillWithNAReg', suspendWhenHidden = FALSE)
+
+output$targetWithoutNAReg <- reactive({
+  targetWithoutNAReg = (!anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetWithoutNAReg)
+})
+outputOptions(output, 'targetWithoutNAReg', suspendWhenHidden = FALSE)
+
 
 ######################
 # Classification tab #
@@ -127,11 +149,14 @@ output$preSampleRateClass <- renderText({
 
 # Adjusting max window size
 observeEvent(input$numOfSamplesClass,{
-  maxWinClass <- v$preRate*(input$numOfSamplesClass)
-  updateSliderInput(session, "maxWindowClass",
-                    value = maxWinClass,
-                    min = 0, max = 10*(maxWinClass), step = 5)
-  
+  # Check preRate
+  if(is.null(v$preRate)) {
+    v$preRate <- 1
+  }
+  v$maxWinClass <- v$preRate*(input$numOfSamplesClass)
+  updateNumericInput(session, "maxWindowClass",
+                     value = v$maxWinClass,
+                     min = 0, max = 10*(v$maxWinClass), step = 1)
 })
 
 # Running Accordion:
@@ -139,7 +164,7 @@ observeEvent(input$goClass,{
   # Update sampling rate of predictors after pre-processing
   v$AIData <- analyseIndependentData(v$data[,-ncol(v$data)])
   v$AIData$Stable.Sampling.Rate <- "yes"
-  
+  # print(input$maxWindowClass)
   # Update Accordion parameters according to the users preferences
   v$PParameterClass <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateClass, input$maxWindowClass)
   v$PParameterClass$nOperations <- input$numOfSamplesClass
@@ -148,7 +173,7 @@ observeEvent(input$goClass,{
   
   # Downsample the target
   aTarIndex <- seq(from = v$PParameterClass$Jump, to = v$AIData$Variables.nrow, by = v$PParameterClass$Jump)
- 
+  
   # Run accordion
   features <- embeddedGainRatioFS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterClass)
   print(summary(features))
@@ -158,6 +183,18 @@ observeEvent(input$goClass,{
   print(summary(treeModel, numFolds = 10))
   # TODO: plot decision tree
   plot(treeModel,cex=0.5)
-
+  
 })
 
+# checking if target has NAs
+output$targetStillWithNAClass <- reactive({
+  targetStillWithNAClass = (anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetStillWithNAClass)
+})
+outputOptions(output, 'targetStillWithNAClass', suspendWhenHidden = FALSE)
+
+output$targetWithoutNAClass <- reactive({
+  targetWithoutNAClass = (!anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetWithoutNAClass)
+})
+outputOptions(output, 'targetWithoutNAClass', suspendWhenHidden = FALSE)

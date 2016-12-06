@@ -268,13 +268,19 @@ dashboardPage(
               fluidRow(
                 # interopolating/reapeting
                 box(width = 12, 
-                    column(6,
-                           selectizeInput(
-                             'colWithNAvalues', 'Select Target',
-                             choices = c('No info to show'),
-                             multiple = F,
-                             options = list(placeholder = 'select variable(s)')
-                             )
+                    conditionalPanel(
+                      'output.targetIsNull',
+                      column(6,
+                             align = 'center',
+                             h4('The selected Target is empty, please go to Merge tab and create the Merged file with a non-empty Target')
+                              )
+                    ),
+                    conditionalPanel(
+                      'output.targetWithNoNAvalues',
+                      column(6,
+                             align = 'center',
+                             h4('The selected Target has no NA values. You can continue to Modeling or further Pre-processing')
+                              )
                     ),
                     conditionalPanel(
                       "output.isTargetNumeric",
@@ -314,10 +320,9 @@ dashboardPage(
                     conditionalPanel(
                       "output.isTargetNonNumeric",
                       column(6, 
-                             "Non-Numerical target, as a result Repeat NA's Policy should be used",
-                             column(12, offset = 4,
-                                    actionButton('repeating2', 'Repeat')
-                             )
+                             align = 'center',
+                             h4("The selected target is Non-Numeric, as a result Repeat NA's Policy should be used"),
+                             actionButton('repeating2', 'Repeat')
                       )
                     )
                   )
@@ -459,26 +464,6 @@ dashboardPage(
                   )
                 )
               )
-              # fluidRow(
-              #   #plots
-              #   column(4,
-              #       selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
-              #   ),
-              #   column(4,
-              #       selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
-              #   ),
-              #   # conditionalPanel(
-              #   #   'output.classPlotcheck',
-              #     column(4, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
-              #   # ),
-              #   ,
-              #   tabBox(
-              #     width = 12,
-              #     tabPanel("Plot", dygraphOutput("plot")),
-              #     tabPanel("Multi-plot", uiOutput("mulplot")),
-              #     tabPanel("Correlation", uiOutput("corplot"))
-              #   )
-              # )
             ),
             # allow x-flow for DT:dataTable
             shinyjs::inlineCSS(list(
@@ -525,36 +510,56 @@ dashboardPage(
       tabItem(
         tabName = 'regression',
         fluidRow(
-          box(width = 4,
-              title = 'Regresion',
-              column(12,
-                     h5(strong('Predictors sampling rate is:')),
-                     box(width = 5,
-                         align = 'center',
-                         h4(uiOutput('preSampleRateReg'))
+          box(width = 12,
+              title = 'Regression',
+              column(3,
+                     column(12,
+                            h5(strong('Predictors sampling rate is:')),
+                            box(width = 8,
+                                align = 'center',
+                                h4(uiOutput('preSampleRateReg'))
+                            )
                      )
-                     
               ),
-              column(8,
+              column(3,
                      # h5(strong('Give Target sampling rate:')),
                      numericInput('tarSampleRateReg',
                                   label = 'Give Target sampling rate:',
                                   min = 0, max = 1,
-                                  value = 0, step = 0.005)
+                                  value = 1, 
+                                  step = 0.005)
               ),
-              column(8,
-                     # h5(strong('Choose Number of samples:')),
-                     numericInput('numOfSamplesReg',
-                                  label = 'Choose Number of samples:',
-                                  value = 10
-                                  )
+              column(3,
+                     column(12,
+                            # h5(strong('Choose Number of samples:')),
+                            numericInput('numOfSamplesReg',
+                                         label = 'Choose Number of samples:',
+                                         value = 10
+                            )
+                     ),
+                     column(12,
+                            numericInput("maxWindowReg", 
+                                         label = "Choose Max window size:",
+                                         min = 0, max = 20, value = 15, step = 1)
+                     )
               ),
-              column(8,
-                     sliderInput("maxWindowReg", "Choose Max window size:",
-                                 min = 0, max = 20, value = 15)
+              conditionalPanel(
+                'output.targetWithoutNAReg',
+                column(3, 
+                       radioButtons('regressionMethod', 'Choose Regression Method',
+                                    c(Linear = 'linearReg',
+                                      Lag  = 'lagReg'),                                                  
+                                    selected = 'linearReg'),
+                       column(12, align = 'right',
+                              actionButton('goReg', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                       )
+                )
               ),
-              column(12, align = 'right',
-                     actionButton('goReg', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+              conditionalPanel(
+                'output.targetStillWithNAReg',
+                column(3,
+                       h4('The selected Target has NA values, go to Pre-processing Tab to Manage Missing values')
+                  )
               )
           )
         )
@@ -562,42 +567,51 @@ dashboardPage(
       tabItem(
         tabName = 'classification',
         fluidRow(
-          box(width = 4,
+          box(width = 12,
               title = 'Classification',
-              column(12,
+              column(3,
                      h5(strong('Predictors sampling rate is:')),
                      box(width = 5,
                          align = 'center',
                          h4(uiOutput('preSampleRateClass'))
                      )
-                     
               ),
-              column(8,
+              column(3,
                      # Target sampling rate:
                      numericInput('tarSampleRateClass',
                                   label = 'Give Target sampling rate:',
                                   min = 0, max = 1,
-                                  value = 0, step = 0.005)
+                                  value = 1, step = 0.005)
               ),
-              column(8,
+              column(3,
                      # h5(strong('Choose Number of samples:')),
                      numericInput('numOfSamplesClass',
                                   label = 'Choose Number of samples:',
                                   value = 10
                                   )
               ),
-              column(8,
-                     sliderInput("maxWindowClass", "Choose Max window size:",
-                                 min = 0, max = 20, value = 15)
+              column(3,
+                     numericInput("maxWindowClass", 
+                                  label = "Choose Max window size:",
+                                  min = 0, max = 20, value = 15, step = 1)
               ),
-              column(12, align = 'right',
-                     actionButton('goClass', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+              conditionalPanel(
+                'output.targetWithoutNAClass',
+                column(12, align = 'right',
+                       actionButton('goClass', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                )
+              ),
+              conditionalPanel(
+                'output.targetStillWithNAClass',
+                column(12, align = 'center',
+                       'The selected Target has NA values. Please go to: Pre-processing Tab to Manaige Missing values'
+                )
               )
           )
         )
       ),
-      
       #</model>  
+
       ######################################################
       ######################   About  ######################
       ######################################################
@@ -610,7 +624,7 @@ dashboardPage(
             title = "About",
             width = 12,
             HTML('<p>Analysis Dashboard aims to provide toolkits to explore datasets in a visualized way, especially for time-series datasets. It includes dataset uploading, plotting, pre-processing, segmentation and biclustering, which offer handy access of different methods and parameters applied to your data.</p>'),
-            HTML('<p>Author: Ricardo Cachucho <a href="mailto:r.cachucho@liacs.leidenuniv.nl">r.cachucho@liacs.leidenuniv.nl</a>, Kaihua liu <a href="mailto:k.liu.5@umail.leidenuniv.nl">k.liu.5@umail.leidenuniv.nl</a></p>')
+            HTML('<p>Author: Ricardo Cachucho <a href="mailto:r.cachucho@liacs.leidenuniv.nl">r.cachucho@liacs.leidenuniv.nl</a>, Stylianos Paraschiakos <a href="mailto: s.paraschiakos@umail.leidenuniv.nl"> s.paraschiakos@umail.leidenuniv.nl</a></p>')
           )
         )
       )
