@@ -4,8 +4,6 @@
 
 # Event of clicking on merge button
 observeEvent(input$confirmMerging, {
-  print('merge')
-  print(input$maxWindowClass)
   predField = input$predictorField
   tarField = input$targetField
   tarOption = input$targetOption

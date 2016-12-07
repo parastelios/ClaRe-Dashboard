@@ -20,11 +20,11 @@ library(RWeka)
 options(shiny.maxRequestSize = 100*1024^2)
 
 # global settings
-DEBUG_UPLOAD_ON  = T
-predictorFile = './data_arcodium/runPre_sub1.csv'
-# predictorFile = './data_arcodium/snowPredictors.csv'
-targetFile = './data_arcodium/runTar_sub1.csv'
-# targetFile = './data_arcodium/snowTarget.csv'
+DEBUG_UPLOAD_ON  = F
+# predictorFile = './data_arcodium/runPre_sub1.csv'
+predictorFile = './data_arcodium/snowPredictors.csv'
+# targetFile = './data_arcodium/runTar_sub1.csv'
+targetFile = './data_arcodium/snowTarget.csv'
 
 # variable names
 AD_GENERAL = 'AD2016General'

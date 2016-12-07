@@ -415,75 +415,75 @@ dashboardPage(
             )
           ),
           tabBox(
-            # plot and data review
-            width = 12,
-            tabPanel(
-              "Plotting", icon = icon("bar-chart"),
-              fluidRow(
-                #plots
-                column(2,
-                  radioButtons('plotType', 'Select Plot',
-                               c(Simple='simplePlot',
-                                 Multiple='multiPlot',
-                                 Correlation='corrPlot'),
-                               selected = 'simplePlot')
-                ),
-                column(3,
-                       selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
-                ),
-                column(3,
-                       selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
-                ),
-                conditionalPanel(
-                  'output.classPlotcheckNAs',
-                  column(3, h4(htmlOutput('textClassWithNA')))
-                ),
-                conditionalPanel(
-                  'output.classPlotcheck',
-                  column(3, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
-                ),
-                column(1, align = 'right',
-                       actionButton('preProsPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
-                ),
-                conditionalPanel(
-                  'output.simplePlotCheck',
-                  box(width = 12,
-                      dygraphOutput("plot")
-                  )
-                ),
-                conditionalPanel(
-                  'output.multiPlotCheck',
-                  box(width = 12,
-                      uiOutput("multi")
-                  )
-                ),
-                conditionalPanel(
-                  'output.corrPlotCheck',
-                  box(width = 12,
-                      uiOutput("corr")
-                  )
+          # plot and data review
+          width = 12,
+          tabPanel(
+            "Plotting", icon = icon("bar-chart"),
+            fluidRow(
+              #plots
+              column(2,
+                     radioButtons('plotType', 'Select Plot',
+                                  c(Simple='simplePlot',
+                                    Multiple='multiPlot',
+                                    Correlation='corrPlot'),
+                                  selected = 'simplePlot')
+              ),
+              column(3,
+                     selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+              ),
+              column(3,
+                     selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+              ),
+              conditionalPanel(
+                'output.classPlotcheckNAs',
+                column(3, h4(htmlOutput('textClassWithNA')))
+              ),
+              conditionalPanel(
+                'output.classPlotcheck',
+                column(3, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
+              ),
+              column(1, align = 'right',
+                     actionButton('preProsPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
+              ),
+              conditionalPanel(
+                'output.simplePlotCheck',
+                box(width = 12,
+                    dygraphOutput("plot")
+                )
+              ),
+              conditionalPanel(
+                'output.multiPlotCheck',
+                box(width = 12,
+                    uiOutput("multi")
+                )
+              ),
+              conditionalPanel(
+                'output.corrPlotCheck',
+                box(width = 12,
+                    uiOutput("corr")
                 )
               )
-            ),
-            # allow x-flow for DT:dataTable
-            shinyjs::inlineCSS(list(
-              ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-            )),
-            tabPanel(
-              "Pre-Processed Data",icon = icon("table"), uiOutput("dataTable")
-            ),
-            tabPanel(
-              "Summary",icon = icon("file-text-o"), verbatimTextOutput("dataSummary")
-            ),
-            tabPanel(
-              tagList(shiny::icon("download"), "Save"), 
-              div(
-                style="text-align:center; padding:30px",
-                downloadButton("processedDataset", 
-                label = "Download pre-processed data table (.CSV)")
-              )
+            )
+          ),
+          # allow x-flow for DT:dataTable
+          shinyjs::inlineCSS(list(
+            ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+          )),
+          tabPanel(
+            "Pre-Processed Data",icon = icon("table"), uiOutput("dataTable")
+          ),
+          tabPanel(
+            "Summary",icon = icon("file-text-o"), verbatimTextOutput("dataSummary")
+          ),
+          tabPanel(
+            tagList(shiny::icon("download"), "Save Datatable"), 
+            div(
+              style="text-align:center; padding:30px",
+              downloadButton("processedDataset", 
+                             label = "Download pre-processed data table (.CSV)")
             )
           )
+        )
           
         )
       ),
@@ -561,6 +561,34 @@ dashboardPage(
                        h4('The selected Target has NA values, go to Pre-processing Tab to Manage Missing values')
                   )
               )
+          ),
+          tabBox(
+            width = 12,
+            # features data plot/review/summary
+            tabPanel(
+              "Plotting Features",  icon = icon("bar-chart"),
+              fluidRow(
+                # features plot
+              )
+            ),
+            # allow x-flow for DT:dataTable
+            shinyjs::inlineCSS(list(
+              ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+            )),
+            tabPanel(
+              "Features Data",icon = icon("table"), uiOutput("featuresRegDataTable")
+            ),
+            tabPanel(
+              "Features Summary",icon = icon("file-text-o"), verbatimTextOutput("featuresRegDataSummary")
+            ),
+            tabPanel(
+              tagList(shiny::icon("download"), "Save Features Data"),
+              div(
+                style="text-align:center; padding:30px",
+                downloadButton("featuresRegDataset",
+                               label = "Download features data table (.CSV)")
+              )
+            )
           )
         )
       ),
@@ -577,23 +605,26 @@ dashboardPage(
                      )
               ),
               column(3,
-                     # Target sampling rate:
+                     # h5(strong('Give Target sampling rate:')),
                      numericInput('tarSampleRateClass',
                                   label = 'Give Target sampling rate:',
                                   min = 0, max = 1,
-                                  value = 1, step = 0.005)
+                                  value = 1, 
+                                  step = 0.005)
               ),
               column(3,
-                     # h5(strong('Choose Number of samples:')),
-                     numericInput('numOfSamplesClass',
-                                  label = 'Choose Number of samples:',
-                                  value = 10
-                                  )
-              ),
-              column(3,
-                     numericInput("maxWindowClass", 
-                                  label = "Choose Max window size:",
-                                  min = 0, max = 20, value = 15, step = 1)
+                     column(12,
+                            # h5(strong('Choose Number of samples:')),
+                            numericInput('numOfSamplesClass',
+                                         label = 'Choose Number of samples:',
+                                         value = 10
+                            )
+                     ),
+                     column(12,
+                            numericInput("maxWindowClass", 
+                                         label = "Choose Max window size:",
+                                         min = 0, max = 20, value = 15, step = 1)
+                     )
               ),
               conditionalPanel(
                 'output.targetWithoutNAClass',
@@ -603,10 +634,38 @@ dashboardPage(
               ),
               conditionalPanel(
                 'output.targetStillWithNAClass',
-                column(12, align = 'center',
-                       'The selected Target has NA values. Please go to: Pre-processing Tab to Manaige Missing values'
+                column(3, align = 'center',
+                       h4('The selected Target has NA values. Please go to: Pre-processing Tab to Manaige Missing values')
                 )
               )
+          ),
+          tabBox(
+            width = 12,
+            # features data plot/review/summary
+            tabPanel(
+              "Plotting Features",  icon = icon("bar-chart"),
+              fluidRow(
+                # features plot
+              )
+            ),
+            # allow x-flow for DT:dataTable
+            shinyjs::inlineCSS(list(
+              ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+            )),
+            tabPanel(
+              "Features Data",icon = icon("table"), uiOutput("featuresClassDataTable")
+            ),
+            tabPanel(
+              "Features Summary",icon = icon("file-text-o"), verbatimTextOutput("featuresClassDataSummary")
+            ),
+            tabPanel(
+              tagList(shiny::icon("download"), "Save Features Data"),
+              div(
+                style="text-align:center; padding:30px",
+                downloadButton("featuresClassDataset",
+                               label = "Download features data table (.CSV)")
+              )
+            )
           )
         )
       ),

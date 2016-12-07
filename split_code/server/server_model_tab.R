@@ -13,7 +13,6 @@ output$selectmodeling <- renderMenu({
   }
 })
 
-
 # event of merging creates options for the models (regression/classification)
 observeEvent(input$confirmMerging,{
   # print(input$maxWindowClass)
@@ -54,6 +53,19 @@ observeEvent(input$confirmMerging,{
 
 ##################
 # Regression tab #
+
+# checking if target has NAs
+output$targetStillWithNAReg <- reactive({
+  targetStillWithNAReg = (anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetStillWithNAReg)
+})
+outputOptions(output, 'targetStillWithNAReg', suspendWhenHidden = FALSE)
+
+output$targetWithoutNAReg <- reactive({
+  targetWithoutNAReg = (!anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetWithoutNAReg)
+})
+outputOptions(output, 'targetWithoutNAReg', suspendWhenHidden = FALSE)
 
 # predictor sample rate
 output$preSampleRateReg <- renderText({
@@ -99,41 +111,68 @@ observeEvent(input$goReg,{
   # Run accordion for lag regression
   if(input$regressionMethod == 'linearReg'){
     print('linear')
-    features <- embedded.Cor.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg)
+    v$features <- embedded.Cor.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg)
   }
   else{
     print('lag')
-    features <- embedded.CCF.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg) 
+    v$features <- embedded.CCF.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg) 
   }
   # TODO: if condition to allow to change the regression to linear regression
   # Run accordion for linear regression
   #
-  print(summary(features))
+  print(summary(v$features))
   
   # build regression model
-  linearModel <- lm(DData ~ ., data=features)
+  linearModel <- lm(DData ~ ., data=v$features)
   print(summary.lm(linearModel))
   # TODO: plot predicted vs real target with dygraphs
   print(summary(predict(linearModel)))
   
+  renderFeaturesRegDataTable(v$features)
 })
 
-# checking if target has NAs
-output$targetStillWithNAReg <- reactive({
-  targetStillWithNAReg = (anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
-  return(targetStillWithNAReg)
-})
-outputOptions(output, 'targetStillWithNAReg', suspendWhenHidden = FALSE)
-
-output$targetWithoutNAReg <- reactive({
-  targetWithoutNAReg = (!anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
-  return(targetWithoutNAReg)
-})
-outputOptions(output, 'targetWithoutNAReg', suspendWhenHidden = FALSE)
-
+# render feature data Reg function
+renderFeaturesRegDataTable <- function(data) {
+  output$featuresRegDataTable <- renderUI({
+    # print(data)
+    if (is.null(data)){
+      fluidRow(box(
+        width = 12,
+        background ="red",
+        tags$h4(icon('bullhorn'),"Features Data NULL!")
+        #HTML("Please upload a dataset to start.")
+      ))
+    }
+    else{
+      output$dataTable0 <- DT::renderDataTable({
+        DT::datatable(data, options = list(pageLength = 20))
+      })
+      DT::dataTableOutput('dataTable0')
+    }
+  })
+  
+  output$featuresRegDataSummary <- renderPrint({
+    if (is.null(data))
+      return()
+    summary(data)
+  })
+}
 
 ######################
 # Classification tab #
+
+# checking if target has NAs
+output$targetStillWithNAClass <- reactive({
+  targetStillWithNAClass = (anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetStillWithNAClass)
+})
+outputOptions(output, 'targetStillWithNAClass', suspendWhenHidden = FALSE)
+
+output$targetWithoutNAClass <- reactive({
+  targetWithoutNAClass = (!anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
+  return(targetWithoutNAClass)
+})
+outputOptions(output, 'targetWithoutNAClass', suspendWhenHidden = FALSE)
 
 # predictor sample rate
 output$preSampleRateClass <- renderText({
@@ -175,26 +214,41 @@ observeEvent(input$goClass,{
   aTarIndex <- seq(from = v$PParameterClass$Jump, to = v$AIData$Variables.nrow, by = v$PParameterClass$Jump)
   
   # Run accordion
-  features <- embeddedGainRatioFS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterClass)
-  print(summary(features))
+  v$features <- embeddedGainRatioFS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterClass)
+  print(summary(v$features))
   
   # Train decision tree and record accuracy
-  treeModel <- J48(DData ~ ., data=features)
+  treeModel <- J48(DData ~ ., data=v$features)
   print(summary(treeModel, numFolds = 10))
   # TODO: plot decision tree
   plot(treeModel,cex=0.5)
   
+  renderFeaturesClassDataTable(v$features)
 })
 
-# checking if target has NAs
-output$targetStillWithNAClass <- reactive({
-  targetStillWithNAClass = (anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
-  return(targetStillWithNAClass)
-})
-outputOptions(output, 'targetStillWithNAClass', suspendWhenHidden = FALSE)
-
-output$targetWithoutNAClass <- reactive({
-  targetWithoutNAClass = (!anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
-  return(targetWithoutNAClass)
-})
-outputOptions(output, 'targetWithoutNAClass', suspendWhenHidden = FALSE)
+# render feature data Class function
+renderFeaturesClassDataTable <- function(data) {
+  output$featuresClassDataTable <- renderUI({
+    # print(data)
+    if (is.null(data)){
+      fluidRow(box(
+        width = 12,
+        background ="red",
+        tags$h4(icon('bullhorn'),"Features Data NULL!")
+        #HTML("Please upload a dataset to start.")
+      ))
+    }
+    else{
+      output$dataTable0 <- DT::renderDataTable({
+        DT::datatable(data, options = list(pageLength = 20))
+      })
+      DT::dataTableOutput('dataTable0')
+    }
+  })
+  
+  output$featuresClassDataSummary <- renderPrint({
+    if (is.null(data))
+      return()
+    summary(data)
+  })
+}
