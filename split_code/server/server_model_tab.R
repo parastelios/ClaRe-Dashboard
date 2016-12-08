@@ -144,10 +144,10 @@ renderFeaturesRegDataTable <- function(data) {
       ))
     }
     else{
-      output$dataTable0 <- DT::renderDataTable({
+      output$featursDataRegTable0 <- DT::renderDataTable({
         DT::datatable(data, options = list(pageLength = 20))
       })
-      DT::dataTableOutput('dataTable0')
+      DT::dataTableOutput('featursDataRegTable0')
     }
   })
   
@@ -239,10 +239,10 @@ renderFeaturesClassDataTable <- function(data) {
       ))
     }
     else{
-      output$dataTable0 <- DT::renderDataTable({
+      output$featursDataClassTable0 <- DT::renderDataTable({
         DT::datatable(data, options = list(pageLength = 20))
       })
-      DT::dataTableOutput('dataTable0')
+      DT::dataTableOutput('featursDataClassTable0')
     }
   })
   
