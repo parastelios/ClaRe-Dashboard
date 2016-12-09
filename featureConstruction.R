@@ -129,20 +129,23 @@ evoS.cor.FC <- function(DData, IData, AIData, PParameter)
                                                                            x=eval(parse(text = paste(AFname,"(IData$",variableName,",AIData$Variables.nrow,PParameter$Jump,",PParameter$Size[i],")",sep="")))))
       names(first.Generation) <- sapply(1:PParameter$nOperations,
                                         function(i) c(paste(variableName, AFname, PParameter$Size[i], sep="_")))
-      nTopCor <- max(abs(first.Generation))
-      print(nTopCor)
+      NAcount <- length(which(is.na(as.vector(first.Generation)) == TRUE))
+      if(NAcount == length(first.Generation))
+        next
+      nTopCor <- max(abs(first.Generation), na.rm = TRUE)
       positive <- list(which(first.Generation == nTopCor))
       negative <- list(which(first.Generation == (-nTopCor)))
       top.Feature <- mapply(c, positive, negative, SIMPLIFY=T)
+      top.Feature <- names(first.Generation[as.vector(top.Feature)])
       
       #evolutionary process
       k <- 1
       while(nTopCor > oTopCor)
       {
-        if(nTopCor < 0.5)
+        if(nTopCor < 0.2)
           break
         oTopCor <- nTopCor
-        seed <- as.numeric(unlist(strsplit(names(top.Feature),split="_"))[3])
+        seed <- as.numeric(unlist(strsplit(top.Feature, split="_"))[3])
         limits <- c(1, PParameter$Size[length(PParameter$Size)])
         #refining the search should discussed with someone!!!
         width <- round(seq(max(limits[1],(seed-PParameter$Jump/k)),min(limits[2],(seed+PParameter$Jump/k)),length.out=PParameter$nOperations))
@@ -150,17 +153,18 @@ evoS.cor.FC <- function(DData, IData, AIData, PParameter)
                                                                       x=eval(parse(text = paste(AFname,"(IData$",variableName,",AIData$Variables.nrow,PParameter$Jump,",width[i],")",sep="")))))
         names(offspring) <- sapply(1:PParameter$nOperations,
                                    function(i) c(paste(variableName, AFname, width[i], sep="_")))
-        nTopCor <- max(abs(offspring))
+        nTopCor <- max(abs(offspring), na.rm = TRUE)
         positive <- list(which(offspring == nTopCor))
         negative <- list(which(offspring == (-nTopCor)))
         top.Feature <- mapply(c, positive, negative, SIMPLIFY=T)
+        top.Feature <- names(offspring[as.vector(top.Feature)])
         k <- k + 1
       }
       
       #saving the feature
-      if(nTopCor > 0.5)
+      if(nTopCor > 0.2)
       {
-        optimal <- as.numeric(unlist(strsplit(names(top.Feature),split="_"))[3])
+        optimal <- as.numeric(unlist(strsplit(top.Feature, split="_"))[3])
         anOutput[1,p]<- cor(y=DData,x=eval(parse(text = paste(AFname,"(IData$",variableName,",AIData$Variables.nrow,PParameter$Jump,",
                                                               optimal,")",sep=""))))
         ncol.names[p] <- c(paste(variableName, AFname, optimal, sep="_"))

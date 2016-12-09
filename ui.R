@@ -560,6 +560,12 @@ dashboardPage(
                 column(3,
                        h4('The selected Target has NA values, go to Pre-processing Tab to Manage Missing values')
                   )
+              ),
+              conditionalPanel(
+                'output.targetConstantReg',
+                column(3,
+                       h4('The selected Target is constant and cannot be predicted, please choose another target')
+                )
               )
           ),
           tabBox(
@@ -568,6 +574,13 @@ dashboardPage(
             tabPanel(
               "Plotting Features",  icon = icon("bar-chart"),
               fluidRow(
+                # running regression image
+                conditionalPanel(
+                  condition="$('html').hasClass('shiny-busy')",
+                  column(12, align = 'center',
+                         tags$img(src="loading_circle.gif")
+                  )
+                )
                 # features plot
               )
             ),
@@ -576,10 +589,32 @@ dashboardPage(
               ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
             )),
             tabPanel(
-              "Features Data",icon = icon("table"), uiOutput("featuresRegDataTable")
+              "Features Data",icon = icon("table"), 
+              fluidRow(
+                # running regression image
+                conditionalPanel(
+                  condition="$('html').hasClass('shiny-busy')",
+                  column(12, align = 'center',
+                         tags$img(src="loading_circle.gif")
+                  )
+                )
+              ),
+              # allow x-flow for DT:dataTable
+              shinyjs::inlineCSS(list(
+                ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+              )),
+              uiOutput("featuresRegDataTable") 
             ),
             tabPanel(
-              "Features Summary",icon = icon("file-text-o"), verbatimTextOutput("featuresRegDataSummary")
+              "Features Summary",icon = icon("file-text-o"),
+              # running regression image
+              conditionalPanel(
+                condition="$('html').hasClass('shiny-busy')",
+                column(12, align = 'center',
+                       tags$img(src="loading_circle.gif")
+                )
+              ),
+              verbatimTextOutput("featuresRegDataSummary")
             ),
             tabPanel(
               tagList(shiny::icon("download"), "Save Features Data"),
@@ -637,6 +672,12 @@ dashboardPage(
                 column(3, align = 'center',
                        h4('The selected Target has NA values. Please go to: Pre-processing Tab to Manaige Missing values')
                 )
+              ),
+              conditionalPanel(
+                'output.targetConstantReg',
+                column(3,
+                       h4('The selected Target is constant and cannot be predicted, please choose another target')
+                )
               )
           ),
           tabBox(
@@ -645,18 +686,45 @@ dashboardPage(
             tabPanel(
               "Plotting Features",  icon = icon("bar-chart"),
               fluidRow(
+                # running classification image
+                conditionalPanel(
+                  condition="$('html').hasClass('shiny-busy')",
+                  column(12, align = 'center',
+                         tags$img(src="loading_circle.gif")
+                         )
+                )
                 # features plot
               )
             ),
-            # allow x-flow for DT:dataTable
-            shinyjs::inlineCSS(list(
-              ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-            )),
             tabPanel(
-              "Features Data",icon = icon("table"), uiOutput("featuresClassDataTable")
+              "Features Data",icon = icon("table"), 
+              fluidRow(
+                # running classification image
+                conditionalPanel(
+                  condition="$('html').hasClass('shiny-busy')",
+                  column(12, align = 'center',
+                         tags$img(src="loading_circle.gif")
+                  )
+                )
+              ),
+              # allow x-flow for DT:dataTable
+              shinyjs::inlineCSS(list(
+                ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+              )),
+              uiOutput("featuresClassDataTable") 
             ),
             tabPanel(
-              "Features Summary",icon = icon("file-text-o"), verbatimTextOutput("featuresClassDataSummary")
+              "Features Summary",icon = icon("file-text-o"), 
+              fluidRow(
+                # running classification image
+                conditionalPanel(
+                  condition="$('html').hasClass('shiny-busy')",
+                  column(12, align = 'center',
+                         tags$img(src="loading_circle.gif")
+                  )
+                ),
+                verbatimTextOutput("featuresClassDataSummary") 
+              )
             ),
             tabPanel(
               tagList(shiny::icon("download"), "Save Features Data"),
@@ -691,5 +759,4 @@ dashboardPage(
       
     )
   )
-  
 )

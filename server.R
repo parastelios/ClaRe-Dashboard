@@ -21,10 +21,10 @@ options(shiny.maxRequestSize = 100*1024^2)
 
 # global settings
 DEBUG_UPLOAD_ON  = F
-# predictorFile = './data_arcodium/runPre_sub1.csv'
-predictorFile = './data_arcodium/snowPredictors.csv'
-# targetFile = './data_arcodium/runTar_sub1.csv'
-targetFile = './data_arcodium/snowTarget.csv'
+predictorFile = './data_arcodium/runPre_sub1.csv'
+# predictorFile = './data_arcodium/snowPredictors.csv'
+targetFile = './data_arcodium/runTar_sub1.csv'
+# targetFile = './data_arcodium/snowTarget.csv'
 
 # variable names
 AD_GENERAL = 'AD2016General'
@@ -49,9 +49,10 @@ shinyServer(function(input, output, session) {
   source(file.path("split_code", "server", "pre_processing_tab","prepro_save_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","prepro_other_options_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","prepro_plot_tab1.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "server_model_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "model_tab", "model_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "model_tab", "model_tab_classification.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "model_tab", "model_tab_regression.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "server_observe_obj.R"),  local = TRUE)$v
-  
   # Load Accordion code (Class/Regres)
   source('rQuickie.R')
   source('featureSelection.R')
