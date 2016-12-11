@@ -120,3 +120,7 @@ renderFeaturesRegDataTable <- function(data) {
     summary(data)
   })
 }
+
+# Plotting feature data
+
+

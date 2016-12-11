@@ -580,8 +580,42 @@ dashboardPage(
                   column(12, align = 'center',
                          tags$img(src="loading_circle.gif")
                   )
-                )
+                ),
                 # features plot
+                column(2,
+                  radioButtons('featuresRegPlotType', 'Select Plot',
+                               c(Simple='simpleRegPlot',
+                                 Multiple='multiRegPlot',
+                                 Correlation='corrRegPlot'),
+                               selected = 'simpleRegPlot')
+                ),
+                column(3,
+                       selectInput('plotRegX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+                ),
+                column(3,
+                       selectInput('plotRegY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+                ),
+                column(1, align = 'right',
+                       actionButton('featuresRegPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
+                ),
+                conditionalPanel(
+                  'output.simplePlotRegCheck',
+                  box(width = 12,
+                      dygraphOutput("plotReg")
+                  )
+                ),
+                conditionalPanel(
+                  'output.multiPlotRegCheck',
+                  box(width = 12,
+                      uiOutput("multiReg")
+                  )
+                ),
+                conditionalPanel(
+                  'output.corrPlotRegCheck',
+                  box(width = 12,
+                      uiOutput("corrReg")
+                  )
+                )
               )
             ),
             # allow x-flow for DT:dataTable
