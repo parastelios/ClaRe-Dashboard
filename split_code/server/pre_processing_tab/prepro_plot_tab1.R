@@ -47,12 +47,11 @@ outputOptions(output, 'classPlotcheck', suspendWhenHidden = FALSE)
 observeEvent(input$preProsPlot, {
   x <- input$plotX
   y <- input$plotY
-  # classes <- input$plotClass
-  get_preProsPlot(input$plotType, v$data, x, y, classes)
+  get_preProsPlot(input$plotType, v$data, x, y)
 })
 
 
-get_preProsPlot <- function(type, data, varX, varY, class){
+get_preProsPlot <- function(type, data, varX, varY){
   
   colorMax = 9
   colors = RColorBrewer::brewer.pal(colorMax, "Pastel1")

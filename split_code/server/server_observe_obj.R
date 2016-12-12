@@ -31,10 +31,8 @@ observe({
   updateSelectInput(session, "excludingVar", choices = d_Col)
   updateSelectInput(session, "outlierRemoval", choices =  d_Col, selected = v$todoOutlierName)
   updateSelectInput(session, "variableCon", choices = d_Col)
-  # updateSelectInput(session, "textCon", choices = variableCon)
- 
-  n_preCol <- ncol(v$data_pre)
   
+  n_preCol <- ncol(v$data_pre)
   if(
     !is.null(n_preCol)
     &&
@@ -44,7 +42,6 @@ observe({
   }
   
   n_tarCol <- ncol(v$data_tar)
-
   if(
     !is.null(n_tarCol)
     &&
@@ -90,4 +87,20 @@ observe({
   output$rowSelected2 <- renderText({
     rowSelected2
   })
+})
+
+################ Modeling tab ##################
+observe({
+  featuresCol <- colnames(v$features)
+  target <- colnames(v$features)[1]
+  
+  ############## plotting Reg ##############
+  updateSelectInput(session, "plotRegX", choices = c("DataIndex", featuresCol))
+  updateSelectInput(session, "plotRegY", choices = featuresCol)
+  updateSelectInput(session, "plotClassReg", choices = levels(v$features[,target]))  
+  
+  ############## plotting Class ##############
+  updateSelectInput(session, "plotClassX", choices = c("DataIndex", featuresCol))
+  updateSelectInput(session, "plotClassY", choices = featuresCol)
+  updateSelectInput(session, "plotClassClass", choices = levels(v$features[,target]))  
 })

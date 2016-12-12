@@ -584,34 +584,38 @@ dashboardPage(
                 # features plot
                 column(2,
                   radioButtons('featuresRegPlotType', 'Select Plot',
-                               c(Simple='simpleRegPlot',
-                                 Multiple='multiRegPlot',
-                                 Correlation='corrRegPlot'),
-                               selected = 'simpleRegPlot')
+                               c(Simple='simplePlotReg',
+                                 Multiple='multiPlotReg',
+                                 Correlation='corrPlotReg'),
+                               selected = 'simplePlotReg')
                 ),
                 column(3,
                        selectInput('plotRegX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
                 ),
                 column(3,
-                       selectInput('plotRegY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+                       selectInput('plotRegY', 'Y Varaible(s)', choices = c('Please apply regression for options'), multiple = T)
+                ),
+                conditionalPanel(
+                  'output.classPlotcheckReg',
+                  column(3, selectInput('plotClassReg', textOutput('textClassSelectorReg'), choices = c('Select Class'), multiple = T))
                 ),
                 column(1, align = 'right',
                        actionButton('featuresRegPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
                 ),
                 conditionalPanel(
-                  'output.simplePlotRegCheck',
+                  'output.simplePlotCheckReg',
                   box(width = 12,
                       dygraphOutput("plotReg")
                   )
                 ),
                 conditionalPanel(
-                  'output.multiPlotRegCheck',
+                  'output.multiPlotCheckReg',
                   box(width = 12,
                       uiOutput("multiReg")
                   )
                 ),
                 conditionalPanel(
-                  'output.corrPlotRegCheck',
+                  'output.corrPlotCheckReg',
                   box(width = 12,
                       uiOutput("corrReg")
                   )
@@ -708,7 +712,7 @@ dashboardPage(
                 )
               ),
               conditionalPanel(
-                'output.targetConstantReg',
+                'output.targetConstantClass',
                 column(3,
                        h4('The selected Target is constant and cannot be predicted, please choose another target')
                 )
@@ -720,14 +724,52 @@ dashboardPage(
             tabPanel(
               "Plotting Features",  icon = icon("bar-chart"),
               fluidRow(
-                # running classification image
+                # running Classression image
                 conditionalPanel(
                   condition="$('html').hasClass('shiny-busy')",
                   column(12, align = 'center',
                          tags$img(src="loading_circle.gif")
-                         )
-                )
+                  )
+                ),
                 # features plot
+                column(2,
+                       radioButtons('featuresClassPlotType', 'Select Plot',
+                                    c(Simple='simplePlotClass',
+                                      Multiple='multiPlotClass',
+                                      Correlation='corrPlotClass'),
+                                    selected = 'simplePlotClass')
+                ),
+                column(3,
+                       selectInput('plotClassX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+                ),
+                column(3,
+                       selectInput('plotClassY', 'Y Varaible(s)', choices = c('Please apply Classification for options'), multiple = T)
+                ),
+                conditionalPanel(
+                  'output.classPlotcheckClass',
+                  column(3, selectInput('plotClassClass', textOutput('textClassSelectorClass'), choices = c('Select Class'), multiple = T))
+                ),
+                column(1, align = 'right',
+                       actionButton('featuresClassPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
+                ),
+                conditionalPanel(
+                  'output.simplePlotCheckClass',
+                  box(width = 12,
+                      dygraphOutput("plotClass")
+                  )
+                ),
+                conditionalPanel(
+                  'output.multiPlotCheckClass',
+                  box(width = 12,
+                      uiOutput("multiClass")
+                  )
+                ),
+                conditionalPanel(
+                  'output.corrPlotCheckClass',
+                  box(width = 12,
+                      uiOutput("corrClass")
+                  )
+                )
               )
             ),
             tabPanel(
