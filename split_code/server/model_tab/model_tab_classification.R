@@ -48,6 +48,7 @@ observeEvent(input$numOfSamplesClass,{
 
 # Running Accordion:
 observeEvent(input$goClass,{
+  v$modeling = 'classification'
   # Update sampling rate of predictors after pre-processing
   v$AIData <- analyseIndependentData(v$data[,-ncol(v$data)])
   v$AIData$Stable.Sampling.Rate <- "yes"
@@ -61,14 +62,8 @@ observeEvent(input$goClass,{
   
   # Run accordion
   v$features <- embeddedGainRatioFS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterClass)
+  
   print(summary(v$features))
-  
-  # Train decision tree and record accuracy
-  treeModel <- J48(DData ~ ., data=v$features)
-  print(summary(treeModel, numFolds = 10))
-  # TODO: plot decision tree
-  plot(treeModel,cex=0.5)
-  
   renderFeaturesClassDataTable(v$features)
 })
 

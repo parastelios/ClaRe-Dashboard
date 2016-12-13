@@ -2,14 +2,17 @@
 output$selectmodeling <- renderMenu({
   target = tail(colnames(v$data),1)
   
-  if(is.numeric(v$data[1,target])){
-    menuItem("Regression", tabName = 'regression', icon = icon("th"))  
+  if(is.numeric(v$data[,target])){
+    menuItem("Regression", tabName = 'regression', icon = icon("th"))
+    # v$modeling = 'regression'
   }
-  else if(! is.numeric(v$data[1,target]) && ! is.null(v$data[1,target])){
+  else if(! is.numeric(v$data[,target]) && ! is.null(v$data[1,target])){
     menuItem("Classification", tabName = 'classification', icon = icon("th"))  
+    # v$modeling = 'classification'
   }
   else{
     menuItem("Model", tabName = 'model', icon = icon("th"))  
+    # v$modeling = 'modeling'
   }
 })
 

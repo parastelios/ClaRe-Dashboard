@@ -57,7 +57,7 @@ observeEvent(input$numOfSamplesReg,{
 
 # Running Accordion:
 observeEvent(input$goReg,{
-  
+  v$modeling = 'regression'
   # Update sampling rate of predictors after pre-processing
   v$AIData <- analyseIndependentData(v$data[,-ncol(v$data)])
   v$AIData$Stable.Sampling.Rate <- "yes"
@@ -82,13 +82,6 @@ observeEvent(input$goReg,{
   }
 
   print(summary(v$features))
-  
-  # build regression model
-  linearModel <- lm(DData ~ ., data=v$features)
-  print(summary.lm(linearModel))
-  # TODO: plot predicted vs real target with dygraphs
-  print(summary(predict(linearModel)))
-  
   renderFeaturesRegDataTable(v$features)
 })
 

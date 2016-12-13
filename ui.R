@@ -32,6 +32,7 @@ dashboardPage(
       menuItem("Import", tabName = "import", icon = icon("file-o")),
       menuItem("Pre-processing", tabName = "preProcessing", icon = icon("cogs")),
       menuItemOutput('selectmodeling'),
+      menuItem("Evaluation", tabName = "evaluation", icon = icon("recycle")),
       menuItem("About", tabName = "about", icon = icon("info-circle"))
     )
   ),
@@ -724,7 +725,7 @@ dashboardPage(
             tabPanel(
               "Plotting Features",  icon = icon("bar-chart"),
               fluidRow(
-                # running Classression image
+                # running Classification image
                 conditionalPanel(
                   condition="$('html').hasClass('shiny-busy')",
                   column(12, align = 'center',
@@ -813,15 +814,45 @@ dashboardPage(
           )
         )
       ),
-      #</model>  
+      #</model>      
 
+      ######################################################
+      ####                 Evaluation                   ####
+      ######################################################
+      tabItem(
+        tabName = 'evaluation',
+        fluidRow(
+          conditionalPanel(
+            'output.isFeaturesEmpty',
+            box(
+              title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i>
+                For more options choose your target variable and run Regression or Classification'),
+              width = 12,
+              h4(
+                HTML('Go to:'),
+                HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                    <i>"Choose your target variable"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i></p>'),
+                HTML('And then:'),
+                HTML('<p><i>"Model (Regression or Classification) "</i></p>')
+              )
+            )
+          ),
+          box(
+            width = 12,
+            title = 'Evaluation',
+            verbatimTextOutput("featuresStatisticsSummary") 
+          )
+        )
+        
+      ),
+      #</evaluation> 
       ######################################################
       ######################   About  ######################
       ######################################################
       
       tabItem(
         tabName = 'about',
-        
         fluidRow(  
           box(
             title = "About",
