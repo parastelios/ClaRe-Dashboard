@@ -832,7 +832,7 @@ dashboardPage(
                 HTML('Go to:'),
                 HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                     <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                    <i>"Choose your target variable"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i></p>'),
+                    <i>"Choose your target variable"</i></p>'),
                 HTML('And then:'),
                 HTML('<p><i>"Model (Regression or Classification) "</i></p>')
               )

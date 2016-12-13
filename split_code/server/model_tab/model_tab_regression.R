@@ -57,7 +57,6 @@ observeEvent(input$numOfSamplesReg,{
 
 # Running Accordion:
 observeEvent(input$goReg,{
-  v$modeling = 'regression'
   # Update sampling rate of predictors after pre-processing
   v$AIData <- analyseIndependentData(v$data[,-ncol(v$data)])
   v$AIData$Stable.Sampling.Rate <- "yes"

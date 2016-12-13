@@ -48,7 +48,6 @@ observeEvent(input$numOfSamplesClass,{
 
 # Running Accordion:
 observeEvent(input$goClass,{
-  v$modeling = 'classification'
   # Update sampling rate of predictors after pre-processing
   v$AIData <- analyseIndependentData(v$data[,-ncol(v$data)])
   v$AIData$Stable.Sampling.Rate <- "yes"
