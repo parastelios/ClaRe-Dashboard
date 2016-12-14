@@ -21,7 +21,7 @@ fileName2 <- "shinyjsBi.js"
 jsCode2 <- readChar(fileName2, file.info(fileName2)$size)
 
 dashboardPage(
-  dashboardHeader(title = "Analysis Dashboard"),
+  dashboardHeader(title = "Accordion Dashboard"),
   dashboardSidebar(
     # change dashboard sidebar appearance
     shinyjs::inlineCSS(list(
@@ -419,7 +419,7 @@ dashboardPage(
           # plot and data review
           width = 12,
           tabPanel(
-            "Plotting", icon = icon("bar-chart"),
+            "Plot", icon = icon("bar-chart"),
             fluidRow(
               #plots
               column(2,
@@ -430,10 +430,10 @@ dashboardPage(
                                   selected = 'simplePlot')
               ),
               column(3,
-                     selectInput('plotX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+                     selectInput('plotX', 'X Variable', choices = c('Please select a dataset'), multiple = F)
               ),
               column(3,
-                     selectInput('plotY', 'Y Varaible(s)', choices = c('Please merge data for options'), multiple = T)
+                     selectInput('plotY', 'Y Variable(s)', choices = c('Please merge data for options'), multiple = T)
               ),
               conditionalPanel(
                 'output.classPlotcheckNAs',
@@ -477,7 +477,7 @@ dashboardPage(
             "Summary",icon = icon("file-text-o"), verbatimTextOutput("dataSummary")
           ),
           tabPanel(
-            tagList(shiny::icon("download"), "Save Datatable"), 
+            tagList(shiny::icon("save"), "Save Datatable"), 
             div(
               style="text-align:center; padding:30px",
               downloadButton("processedDataset", 
@@ -573,7 +573,7 @@ dashboardPage(
             width = 12,
             # features data plot/review/summary
             tabPanel(
-              "Plotting Features",  icon = icon("bar-chart"),
+              "Plot Features",  icon = icon("bar-chart"),
               fluidRow(
                 # running regression image
                 conditionalPanel(
@@ -591,10 +591,10 @@ dashboardPage(
                                selected = 'simplePlotReg')
                 ),
                 column(3,
-                       selectInput('plotRegX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+                       selectInput('plotRegX', 'X variable', choices = c('Please select a dataset'), multiple = F)
                 ),
                 column(3,
-                       selectInput('plotRegY', 'Y Varaible(s)', choices = c('Please apply regression for options'), multiple = T)
+                       selectInput('plotRegY', 'Y variable(s)', choices = c('Please apply regression for options'), multiple = T)
                 ),
                 conditionalPanel(
                   'output.classPlotcheckReg',
@@ -656,7 +656,7 @@ dashboardPage(
               verbatimTextOutput("featuresRegDataSummary")
             ),
             tabPanel(
-              tagList(shiny::icon("download"), "Save Features Data"),
+              tagList(shiny::icon("save"), "Save Features Data"),
               div(
                 style="text-align:center; padding:30px",
                 downloadButton("featuresRegDataset",
@@ -723,7 +723,7 @@ dashboardPage(
             width = 12,
             # features data plot/review/summary
             tabPanel(
-              "Plotting Features",  icon = icon("bar-chart"),
+              "Plot Features",  icon = icon("bar-chart"),
               fluidRow(
                 # running Classification image
                 conditionalPanel(
@@ -741,10 +741,10 @@ dashboardPage(
                                     selected = 'simplePlotClass')
                 ),
                 column(3,
-                       selectInput('plotClassX', 'X Varaible', choices = c('Please select a dataset'), multiple = F)
+                       selectInput('plotClassX', 'X variable', choices = c('Please select a dataset'), multiple = F)
                 ),
                 column(3,
-                       selectInput('plotClassY', 'Y Varaible(s)', choices = c('Please apply Classification for options'), multiple = T)
+                       selectInput('plotClassY', 'Y variable(s)', choices = c('Please apply Classification for options'), multiple = T)
                 ),
                 conditionalPanel(
                   'output.classPlotcheckClass',
@@ -804,7 +804,7 @@ dashboardPage(
               )
             ),
             tabPanel(
-              tagList(shiny::icon("download"), "Save Features Data"),
+              tagList(shiny::icon("save"), "Save Features Data"),
               div(
                 style="text-align:center; padding:30px",
                 downloadButton("featuresClassDataset",
@@ -825,23 +825,86 @@ dashboardPage(
           conditionalPanel(
             'output.isFeaturesEmpty',
             box(
-              title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i>
-                For more options choose your target variable and run Regression or Classification'),
-              width = 12,
-              h4(
-                HTML('Go to:'),
-                HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+              width = 12, align = 'center',
+              # TODO: this title as pop up
+              title = HTML('No model is selected. For more options <b>Create</b> or <b>Import</b> a Model'),
+              box(
+                width = 6, 
+                title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i> Model creation'),
+                h4(
+                  HTML('Go to:'),
+                  HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                     <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                     <i>"Choose your target variable"</i></p>'),
-                HTML('And then:'),
-                HTML('<p><i>"Model (Regression or Classification) "</i></p>')
+                  HTML('And then:'),
+                  HTML('<p><i>"Model (Regression or Classification) "</i></p>')
+                )
+              ),
+              box(
+                width = 6,
+                title = HTML('<i class="fa fa-upload" aria-hidden="true"></i> Import Model'), 
+                HTML('IMPORT MODEL'),
+                HTML('<p>IMPORT DATA</p>')
               )
             )
           ),
-          box(
-            width = 12,
-            title = 'Evaluation',
-            verbatimTextOutput("featuresStatisticsSummary") 
+          conditionalPanel(
+            'output.featuresNonEmpty',
+            tabBox(
+              id = "evalTabs",
+              width = 12,
+              tabPanel(
+                "Model Summary", icon = icon("file-text-o"),
+                fluidRow(
+                  # model summary  
+                  box(
+                    width = 12,
+                    verbatimTextOutput("featuresStatisticsSummary") 
+                  )
+                )
+              ),
+              tabPanel(
+                "Model Visualization", icon = icon("sitemap"), #("file-image-o"),
+                fluidRow(
+                  # visualization
+                  # regression
+                  conditionalPanel(
+                    "output.isRegression",
+                    box(width = 12,
+                        title = 'Plot: Real target vs Predicted target',
+                        dygraphOutput("targetTargetPlot")
+                    ),
+                    box(
+                      width = 12,
+                      verbatimTextOutput("modelSummary") 
+                    )
+                  ),
+                  # classification
+                  conditionalPanel(
+                    "output.isClassification",
+                    box(
+                      width = 12,
+                      title = "Decision Tree",
+                      plotOutput("decisionTree")
+                    )
+                  )
+                )
+              ),
+              tabPanel(
+                "Export Model", icon = icon("download"),
+                fluidRow(
+                  # export
+                  
+                )
+              ),
+              tabPanel(
+                "Import Model", icon = icon("upload"),
+                fluidRow(
+                  # import
+                  
+                )
+              )
+            )
           )
         )
         
@@ -857,7 +920,7 @@ dashboardPage(
           box(
             title = "About",
             width = 12,
-            HTML('<p>Analysis Dashboard aims to provide toolkits to explore datasets in a visualized way, especially for time-series datasets. It includes dataset uploading, plotting, pre-processing, segmentation and biclustering, which offer handy access of different methods and parameters applied to your data.</p>'),
+            HTML('<p>Acordion Dashboard aims to provide toolkits to explore datasets in a visualized way, especially for time-series datasets. It includes dataset uploading, pre-processing (merge, manage missing values, plot etc.), modeling (regression, classification), evaluation (model summary, visualization, export-import model)  which offer handy access of different methods and parameters applied to your data.</p>'),
             HTML('<p>Author: Ricardo Cachucho <a href="mailto:r.cachucho@liacs.leidenuniv.nl">r.cachucho@liacs.leidenuniv.nl</a>, Stylianos Paraschiakos <a href="mailto: s.paraschiakos@umail.leidenuniv.nl"> s.paraschiakos@umail.leidenuniv.nl</a></p>')
           )
         )
