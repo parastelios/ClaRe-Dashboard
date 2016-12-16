@@ -57,22 +57,47 @@ observeEvent(input$goReg,{
     predicted_target = v$predicted_target
     summary(as.data.frame(cbind(target, predicted_target)))
   })
+  
+  # export model
+  output$exportModel <- downloadHandler(
+    filename = function() {
+      paste('RegressiontionModel-', Sys.time(), '.rda', sep='')
+    },
+    content = function(file) {
+      save(linearModel, file = file)
+    }
+  )
+  # TODO:export data (real and predicted data plus timestamps)
+  
 })
 
 # classification
 observeEvent(input$goClass,{
   # Train decision tree and record accuracy
   treeModel <- J48(DData ~ ., data=v$features)
-  print(summary(treeModel, numFolds = 10))
+  print(summary( treeModel, numFolds = 10))
   # print(treeModel)
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
       return()
     else
-      summary(treeModel, numFolds = 10)
+      summary( treeModel, numFolds = 10)
   })
   # plot decision tree
+  # TODO: make it look nicer
   output$decisionTree <- renderPlot({
-    plot(treeModel)
+    plot( treeModel)
   })
+  
+  # export model
+  output$exportModel <- downloadHandler(
+    filename = function() {
+      paste('ClassificationModel-', Sys.time(), '.rda', sep='')
+    },
+    content = function(file) {
+      write(treeModel, file)
+    }
+  )
+  
+  # TODO:export data (real and predicted data plus timestamps)
 })

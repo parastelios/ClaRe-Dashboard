@@ -115,6 +115,9 @@ renderFeaturesRegDataTable <- function(data) {
 #                   Plot Features                 #
 ###################################################
 
+# TODO: FIX bug for timestamps
+# TODO: make it plot faster
+
 # checking if target is NonNumerical to enable target's classes
 output$classPlotcheckReg <- reactive({
   target = colnames(v$features)[1]
@@ -366,5 +369,7 @@ get_featuresRegPlot <- function(type, data, varX, varY){
     result_div <- tagAppendChild(result_div, dop)
   })
 }
+
+
 
 

@@ -97,6 +97,9 @@ renderFeaturesClassDataTable <- function(data) {
 #                   Plot Features                 #
 ###################################################
 
+# TODO: FIX bug for timestamps
+# TODO: make it plot faster
+
 # checking if target is NonNumerical to enable target's classes
 output$classPlotcheckClass <- reactive({
   target = colnames(v$features)[1]
@@ -348,3 +351,4 @@ get_featuresClassPlot <- function(type, data, varX, varY){
     result_div <- tagAppendChild(result_div, dop)
   })
 }
+

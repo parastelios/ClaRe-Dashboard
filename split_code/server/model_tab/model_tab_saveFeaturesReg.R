@@ -11,3 +11,5 @@ output$featuresRegDataset <- downloadHandler(
     write.csv(v$features, file, row.names=FALSE)
   }
 )
+
+

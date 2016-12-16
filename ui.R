@@ -21,6 +21,7 @@ fileName2 <- "shinyjsBi.js"
 jsCode2 <- readChar(fileName2, file.info(fileName2)$size)
 
 dashboardPage(
+  skin = "blue",
   dashboardHeader(title = "Accordion Dashboard"),
   dashboardSidebar(
     # change dashboard sidebar appearance
@@ -285,29 +286,31 @@ dashboardPage(
                     ),
                     conditionalPanel(
                       "output.isTargetNumeric",
-                      column(6,
-                             selectizeInput(
-                               'theNApolicy', "The target is Numerical, Select NA's Policy",
-                               choices = c('Interpolation', 'Repeating'),
-                               multiple = F
+                      column(12,
+                             column(4,
+                                    selectizeInput(
+                                      'theNApolicy', 
+                                      "Select NA's Policy (numerical Target)",
+                                      choices = c('Interpolation', 'Repeating'),
+                                      multiple = F
+                                    )
                              ),
                              conditionalPanel(
                                'input.theNApolicy == "Interpolation"',
-                               column(12, 
-                                      box(
-                                        title = 'Interpolation Methods',
-                                        width = 8, 
-                                        radioButtons('interpolationMethod', 'Method',
-                                                     c(Linear ='linear',
-                                                       Spline = 'spline',
-                                                       Stineman = 'stine' ),                                                  
-                                                     selected = 'linear',
-                                                     inline = TRUE)
+                               column(4,
+                                      radioButtons('interpolationMethod', 'Select an interpolation Method',
+                                                   c(Linear ='linear',
+                                                     Spline = 'spline',
+                                                     Stineman = 'stine' ),                                                  
+                                                   selected = 'linear',
+                                                   inline = F)
                                       ),
-                                      column(4,
+                                column(12,
+                                      # align = 'right',
+                                      offset = 10,
                                       actionButton('interpolate',
                                                    'Interpolate')
-                                      )
+                                 
                                 )
                              ),
                              conditionalPanel(
@@ -337,6 +340,7 @@ dashboardPage(
                   "#shiny-tab-preprocessing .goButton" = "position: absolute; right:10px; bottom: 20px"
                 )),
                 box(
+                  # status = "warning",
                   width = 4,
                   height = "200px",
                   title = "Excludes",
@@ -497,13 +501,14 @@ dashboardPage(
         tabName = 'model',
         fluidRow(
           box(width = 12,
+              align = 'center',
               title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i> 
                             For more options choose your target variable'),
               h4(
-              HTML('Go to:'),
-              HTML('<i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+              HTML('<b>Go to:</b>'),
+              HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                     <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                    <i>"Choose your target variable"</i>')
+                    <i>"Choose your target variable"</i></p>')
               )
           )
         )
@@ -657,10 +662,12 @@ dashboardPage(
             ),
             tabPanel(
               tagList(shiny::icon("save"), "Save Features Data"),
-              div(
-                style="text-align:center; padding:30px",
-                downloadButton("featuresRegDataset",
-                               label = "Download features data table (.CSV)")
+              fluidRow(
+                div(
+                  style="text-align:center; padding:30px",
+                  downloadButton("featuresRegDataset",
+                                 label = "Download features data table (.CSV)")
+                )
               )
             )
           )
@@ -709,7 +716,7 @@ dashboardPage(
               conditionalPanel(
                 'output.targetStillWithNAClass',
                 column(3, align = 'center',
-                       h4('The selected Target has NA values. Please go to: Pre-processing Tab to Manaige Missing values')
+                       h4('The selected Target has NA values. Please go to: Pre-processing Tab to Manage Missing values')
                 )
               ),
               conditionalPanel(
@@ -824,27 +831,35 @@ dashboardPage(
         fluidRow(
           conditionalPanel(
             'output.isFeaturesEmpty',
-            box(
-              width = 12, align = 'center',
-              # TODO: this title as pop up
-              title = HTML('No model is selected. For more options <b>Create</b> or <b>Import</b> a Model'),
-              box(
-                width = 6, 
-                title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i> Model creation'),
-                h4(
-                  HTML('Go to:'),
-                  HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                    <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                    <i>"Choose your target variable"</i></p>'),
-                  HTML('And then:'),
-                  HTML('<p><i>"Model (Regression or Classification) "</i></p>')
+            tabBox(
+              id = "evalEmpty",
+              width = 12,
+              tabPanel(
+                "Create Model", icon = icon("info"),
+                fluidRow(
+                  align = 'center',
+                  column(6, 
+                    # align = 'center',
+                    h4(
+                      HTML('<b>Go to:</b>'),
+                      HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                           <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                           <i>"Choose your target variable"</i></p>'),
+                      HTML('<b>And then:</b>'),
+                      HTML('<p><i>"Model (Regression or Classification) "</i></p>')
+                      )
+                    )
                 )
               ),
-              box(
-                width = 6,
-                title = HTML('<i class="fa fa-upload" aria-hidden="true"></i> Import Model'), 
-                HTML('IMPORT MODEL'),
-                HTML('<p>IMPORT DATA</p>')
+              tabPanel(
+                "Import Model", icon = icon("upload"),
+                fluidRow(
+                  column(12,
+                    align = 'center',
+                    HTML('IMPORT MODEL'),
+                    HTML('<p>IMPORT DATA</p>')
+                  )
+                )
               )
             )
           ),
@@ -864,7 +879,7 @@ dashboardPage(
                 )
               ),
               tabPanel(
-                "Model Visualization", icon = icon("sitemap"), #("file-image-o"),
+                "Visualize Model", icon = icon("sitemap"), #("file-image-o"),
                 fluidRow(
                   # visualization
                   # regression
@@ -891,10 +906,16 @@ dashboardPage(
                 )
               ),
               tabPanel(
-                "Export Model", icon = icon("download"),
-                fluidRow(
-                  # export
-                  
+                # export
+                # column(12,
+                #        align = 'center',
+                #        actionButton('exportModel', 'Export Model (.rda)', class="goButton", icon = icon("download"))
+                # )
+                tagList(shiny::icon("download"), "Export Model"),
+                div(
+                  style="text-align:center; padding:30px",
+                  downloadButton("exportModel",
+                                 label = "Export Model (.rda)")
                 )
               ),
               tabPanel(

@@ -2,6 +2,9 @@
 #                   Plot Data                     #
 ###################################################
 
+# TODO: FIX bug for timestamps
+# TODO: make it plot faster
+
 # checking if target is NonNumerical to enable target's classes
 
 #if it has NA's
