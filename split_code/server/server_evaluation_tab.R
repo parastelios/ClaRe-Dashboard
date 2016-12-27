@@ -36,6 +36,7 @@ observeEvent(input$goReg,{
   # build regression model
   linearModel <- lm(DData ~ ., data=v$features)
   print(summary.lm(linearModel)) 
+  PParameterReg <- v$PParameterReg
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
       return()
@@ -59,16 +60,27 @@ observeEvent(input$goReg,{
   })
   
   # export model
+  print(linearModel)
   output$exportModel <- downloadHandler(
     filename = function() {
       paste('RegressiontionModel-', Sys.time(), '.rda', sep='')
     },
     content = function(file) {
-      save(linearModel, file = file)
+      save(linearModel, PParameterReg, file = file)
     }
   )
-  # TODO:export data (real and predicted data plus timestamps)
-  
+  # TODO:export data  plus timestamps
+  target <- v$features[,"DData"]
+  predicted_target = v$predicted_target
+  dataModelReg <- as.data.frame(cbind(target, predicted_target)) 
+  output$exportModelData <- downloadHandler(
+    filename = function() {
+      paste('RegModelData-', Sys.time(), '.csv', sep='')
+    },
+    content = function(file) {
+      write.csv(dataModelReg, file, row.names=FALSE)
+    }
+  )
 })
 
 # classification
@@ -76,6 +88,7 @@ observeEvent(input$goClass,{
   # Train decision tree and record accuracy
   treeModel <- J48(DData ~ ., data=v$features)
   print(summary( treeModel, numFolds = 10))
+  PParameterClass <- v$PParameterClass
   # print(treeModel)
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
@@ -90,14 +103,26 @@ observeEvent(input$goClass,{
   })
   
   # export model
+  print(treeModel)
   output$exportModel <- downloadHandler(
     filename = function() {
       paste('ClassificationModel-', Sys.time(), '.rda', sep='')
     },
     content = function(file) {
-      write(treeModel, file)
+      save(treeModel, PParameterClass, file = file)
     }
   )
   
-  # TODO:export data (real and predicted data plus timestamps)
+  # TODO:export data plus timestamps
+  target <- v$features[,"DData"]
+  predicted_target = v$predicted_target
+  dataModelClass <- as.data.frame(cbind(target, predicted_target)) 
+  output$exportModelData <- downloadHandler(
+    filename = function() {
+      paste('ClassModelData-', Sys.time(), '.csv', sep='')
+    },
+    content = function(file) {
+      write.csv(dataModelClass, file, row.names=FALSE)
+    }
+  )
 })

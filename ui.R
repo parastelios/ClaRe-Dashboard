@@ -906,23 +906,85 @@ dashboardPage(
                 )
               ),
               tabPanel(
-                # export
-                # column(12,
-                #        align = 'center',
-                #        actionButton('exportModel', 'Export Model (.rda)', class="goButton", icon = icon("download"))
-                # )
                 tagList(shiny::icon("download"), "Export Model"),
                 div(
                   style="text-align:center; padding:30px",
                   downloadButton("exportModel",
                                  label = "Export Model (.rda)")
+                ),
+                div(
+                  style="text-align:center; padding:30px",
+                  downloadButton("exportModelData",
+                                 label = "Export Model Dataset (.csv)")
                 )
               ),
               tabPanel(
                 "Import Model", icon = icon("upload"),
                 fluidRow(
                   # import
-                  
+                  box(
+                    width = 12,
+                    title = "Import Model",
+                    fluidRow(
+                      column(
+                        12,
+                        uiOutput('ImportModel')
+                        # fileInput('file1', 'Choose CSV File',
+                        #           accept=c('text/csv',
+                        #                    'text/comma-separated-values,text/plain',
+                        #                    '.csv'))
+                        
+                      )
+                    )
+                  ),
+                  box(
+                    width = 12,
+                    title = "Import Data",
+                    fluidRow(
+                      box(
+                        width = 4,
+                        radioButtons('sep', 'Separator',
+                                     c(Comma=',',
+                                       Semicolon=';',
+                                       Tab='\t'),
+                                     ',')
+                      ),
+                      box(
+                        width = 4,
+                        radioButtons('quote', 'Quote',
+                                     c(None='',
+                                       'Double Quote'='"',
+                                       'Single Quote'="'"),
+                                     '"')
+                      ),
+                      box(
+                        width = 4,
+                        checkboxInput('header', 'Header', TRUE)
+                        
+                      )
+                    ),
+                    fluidRow(
+                      box(
+                        width = 12,
+                        uiOutput('ImportModelDataset')
+                        # fileInput('file1', 'Choose CSV File',
+                        #           accept=c('text/csv',
+                        #                    'text/comma-separated-values,text/plain',
+                        #                    '.csv'))
+                        
+                      ),
+                      
+                      # allow x-flow for DT:dataTable
+                      shinyjs::inlineCSS(list(
+                        ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                      )),
+                      tabBox(
+                        width = 12,
+                        tabPanel("Model Data", uiOutput("modelDataTable")),
+                        tabPanel("Summary", verbatimTextOutput("modelDataSummary"))
+                      )
+                    )
+                  )
                 )
               )
             )
