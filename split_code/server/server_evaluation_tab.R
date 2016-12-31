@@ -34,16 +34,16 @@ outputOptions(output, 'isClassification', suspendWhenHidden = FALSE)
 # regression
 observeEvent(input$goReg,{
   # build regression model
-  linearModel <- lm(DData ~ ., data=v$features)
-  print(summary.lm(linearModel)) 
+  model <- lm(DData ~ ., data=v$features)
+  print(summary.lm(model)) 
   PParameterReg <- v$PParameterReg
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
       return()
     else
-      summary.lm(linearModel)
+      summary.lm(model)
   })
-  v$predicted_target <- predict(linearModel)
+  v$predicted_target <- predict(model)
   # plot predicted vs real target with dygraphs
   output$targetTargetPlot <- renderDygraph({
     varX <- seq(from = 1, to = nrow(v$features))
@@ -60,13 +60,13 @@ observeEvent(input$goReg,{
   })
   
   # export model
-  print(linearModel)
+  print(model)
   output$exportModel <- downloadHandler(
     filename = function() {
       paste('RegressiontionModel-', Sys.time(), '.rda', sep='')
     },
     content = function(file) {
-      save(linearModel, PParameterReg, file = file)
+      save(model, PParameterReg, file = file)
     }
   )
   # TODO:export data  plus timestamps
@@ -86,30 +86,31 @@ observeEvent(input$goReg,{
 # classification
 observeEvent(input$goClass,{
   # Train decision tree and record accuracy
-  treeModel <- J48(DData ~ ., data=v$features)
-  print(summary( treeModel, numFolds = 10))
+  model <- J48(DData ~ ., data=v$features)
+  .jcache(model$classifier)
+  print(summary(model, numFolds = 10))
   PParameterClass <- v$PParameterClass
-  # print(treeModel)
+  # print(model)
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
       return()
     else
-      summary( treeModel, numFolds = 10)
+      summary(model, numFolds = 10)
   })
   # plot decision tree
   # TODO: make it look nicer
   output$decisionTree <- renderPlot({
-    plot( treeModel)
+    plot( model)
   })
   
   # export model
-  print(treeModel)
+  print(model)
   output$exportModel <- downloadHandler(
     filename = function() {
       paste('ClassificationModel-', Sys.time(), '.rda', sep='')
     },
     content = function(file) {
-      save(treeModel, PParameterClass, file = file)
+      save(model, PParameterClass, file = file)
     }
   )
   
@@ -125,4 +126,218 @@ observeEvent(input$goClass,{
       write.csv(dataModelClass, file, row.names=FALSE)
     }
   )
+})
+
+#################################################
+#        Import new Model and Data              #
+
+# import Model
+updatemodelInput <- function (name = NULL){
+  output$loadModel <- renderUI({
+    
+    index <- isolate(v$loadModel) # re-render
+    result <- div()
+    
+    result <- tagAppendChild(
+      result,
+      fileInput(paste0('modelFile', index), 
+                'Choose Model File (.rda/.rds)',
+                accept = c(
+                  "text/rds",
+                  "text/rda",
+                  "text/RData",
+                  "text/plain",
+                  ".rda",
+                  ".RData",
+                  ".rds"
+                )
+      )
+    )
+    
+    if(!is.null(name)){
+      result <- tagAppendChild(
+        result, 
+        div(
+          class="progress progress-striped",
+          
+          div(
+            class="progress-bar",
+            style="width: 100%",
+            name, 
+            " upload complete"
+          )
+        )
+      )
+    }
+    
+    result
+    
+  })
+}
+
+updatemodelInput()
+
+# using reactive to dynamically import 
+# model input
+dataInputModel <- reactive({
+  
+  Model_inFile <- input[[paste0('modelFile', v$loadModel)]]
+  
+  if (is.null(Model_inFile)){
+    # return(NULL)
+    return(v$model)
+  }
+  
+  load(Model_inFile$datapath)
+  
+  # modelFinal 
+  if (is.null(model)){
+    v$model <- NULL
+  }
+  else{
+    v$model <- model
+  }
+  
+  if (!is.null(v$model)){
+    v$loadModel <- v$loadModel + 1
+    updatemodelInput(name = Model_inFile$name)
+  }
+  
+  # return model for display
+  return(v$model)
+})
+
+# model preview
+output$modelPreview <- renderPrint({
+  model <- dataInputModel()
+  
+  if (is.null(model))
+    return()
+  
+  summary(model)
+})
+
+# import model dataset
+updatemodelDataInput <- function (name = NULL){
+  output$loadModelData <- renderUI({
+    
+    index <- isolate(v$loadModelData) # re-render
+    result <- div()
+    
+    result <- tagAppendChild(
+      result,
+      fileInput(paste0('modelDataFile', index), 
+                'Choose Data File (.csv)',
+                accept=c('text/csv','text/comma-separated-values,text/plain','.csv'))
+    )
+    
+    if(!is.null(name)){
+      result <- tagAppendChild(
+        result, 
+        div(
+          class="progress progress-striped",
+          
+          div(
+            class="progress-bar",
+            style="width: 100%",
+            name, 
+            " upload complete"
+          )
+        )
+      )
+    }
+    
+    result
+    
+  })
+}
+
+updatemodelDataInput()
+
+# using reactive to dynamically import dataset
+# modeldata input
+dataInputModelData <- reactive({
+  
+  ModelData_inFile <- input[[paste0('modelDataFile', v$loadModelData)]]
+  
+  if (is.null(ModelData_inFile)){
+    # return(NULL)
+    return(v$modelData)
+  }
+  
+  d_model <- data.frame( 
+    read.csv(
+      ModelData_inFile$datapath, 
+      header=input$modelHeader, 
+      sep=input$modelSep,
+      quote=input$modelQuote
+    )
+  )
+  
+  # dataFinal <- d
+  v$modelData <- d_model
+  
+  if (
+    is.null(d_model)
+    || ncol(d_model) == 0
+  ){
+    v$data_model <- NULL
+  }
+  else{
+    v$data_model <- d_model
+  }
+  
+  if (!is.null(v$data_model)){
+    v$loadModelData <- v$loadModelData + 1
+    updatemodelDataInput(name = ModelData_inFile$name)
+  }
+  
+  # return modelData for display
+  return(v$modelData)
+})
+
+# table with navigation tab
+# renderTable will kill the browser when is large
+
+# modelData
+output$modelDataTable <- renderUI({
+  
+  d_model <- dataInputModelData()
+  
+  if (is.null(d_model)){
+    
+    fluidRow(box(
+      width = 12,
+      background ="green",
+      
+      tags$h4(icon('bullhorn'),"Welcome"),
+      HTML("Please upload a Model dataset to start.")
+      
+    ))
+  }
+  else{
+    
+    output$modelDataTable1 <- DT::renderDataTable({
+      
+      DT::datatable(d_model, options = list(pageLength = 20))
+    })
+    
+    DT::dataTableOutput('modelDataTable1')
+  }
+})
+
+# modelData summary
+output$modelDataSummary <- renderPrint({
+  d_model <- dataInputModelData()
+  
+  if (is.null(d_model))
+    return()
+  
+  summary(d_model)
+})
+
+# Run loaded model
+# Event of clicking on runModel0 button
+observeEvent(input$runModel0, {
+  
 })

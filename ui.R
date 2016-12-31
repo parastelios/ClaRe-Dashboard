@@ -854,10 +854,88 @@ dashboardPage(
               tabPanel(
                 "Import Model", icon = icon("upload"),
                 fluidRow(
-                  column(12,
-                    align = 'center',
-                    HTML('IMPORT MODEL'),
-                    HTML('<p>IMPORT DATA</p>')
+                  # import model
+                  tabBox(
+                    id = "importModelTab0",
+                    width = 6,
+                    tabPanel(
+                      "Load Model", icon = icon("upload"), #("file-image-o"),
+                      fluidRow(
+                        box(width = 12,
+                            # fileInput("importModel0", 
+                            #           "Choose Model File",
+                            #           accept = c(
+                            #             "text/rds",
+                            #             "text/rda",
+                            #             "text/RData",
+                            #             "text/plain",
+                            #             ".rda",
+                            #             ".RData",
+                            #             ".rds"
+                            #           )
+                            # )
+                        # ),
+                        # column(12, align = "center",
+                        #        actionButton('loadNewModel0', 'Load Model', class="goButton", icon = icon("sign-in"))
+                        uiOutput('loadModel0')
+                        )
+                      )
+                    ),
+                    tabPanel(
+                      "Model Preview", icon = icon("file-text-o"),
+                      verbatimTextOutput("modelPreview0")
+                    )
+                  ),
+                  # import data model
+                  tabBox(
+                    id = "importDataModelTab0",
+                    width = 6,
+                    tabPanel(
+                      "Load Data", icon = icon("upload"),
+                      fluidRow(
+                        box(
+                          width = 12,
+                          # fileInput('loadModelData0', 'Choose CSV File',
+                          #           accept=c('text/csv', 
+                          #                    'text/comma-separated-values,text/plain', 
+                          #                    '.csv'))  
+                          uiOutput('loadModelData0')
+                        ),
+                        column(4,
+                          checkboxInput('modelHeader0', 'Header', TRUE)
+                        ),
+                        column(4,
+                          radioButtons('modelSep0', 'Separator',
+                                       c(Comma=',',
+                                         Semicolon=';',
+                                         Tab='\t'),
+                                       ',')
+                        ),
+                        column(4,
+                          radioButtons('modelQuote0', 'Quote',
+                                       c(None='',
+                                         'Double Quote'='"',
+                                         'Single Quote'="'"),
+                                       '"')
+                          )
+                      )
+                    ),
+                    # allow x-flow for DT:dataTable
+                    shinyjs::inlineCSS(list(
+                      ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                    )),
+                    tabPanel(
+                      "Model Data", icon = icon("table"),
+                      uiOutput("modelDataTable0")
+                      ),
+                    tabPanel(
+                      "Data Summary", icon = icon("file-text-o"),
+                      verbatimTextOutput("modelDataSummary0")
+                    )
+                  ),
+                  box(width = 12, align = 'center',
+                      actionButton('runModel0', 'Run Model', class="goButton", icon = icon("sign-in")
+                      )
                   )
                 )
               )
@@ -871,6 +949,13 @@ dashboardPage(
               tabPanel(
                 "Model Summary", icon = icon("file-text-o"),
                 fluidRow(
+                  # running image
+                  conditionalPanel(
+                    condition="$('html').hasClass('shiny-busy')",
+                    column(12, align = 'center',
+                           tags$img(src="loading_circle.gif")
+                    )
+                  ),
                   # model summary  
                   box(
                     width = 12,
@@ -881,6 +966,13 @@ dashboardPage(
               tabPanel(
                 "Visualize Model", icon = icon("sitemap"), #("file-image-o"),
                 fluidRow(
+                  # running image
+                  conditionalPanel(
+                    condition="$('html').hasClass('shiny-busy')",
+                    column(12, align = 'center',
+                           tags$img(src="loading_circle.gif")
+                    )
+                  ),
                   # visualization
                   # regression
                   conditionalPanel(
@@ -921,69 +1013,88 @@ dashboardPage(
               tabPanel(
                 "Import Model", icon = icon("upload"),
                 fluidRow(
-                  # import
-                  box(
-                    width = 12,
-                    title = "Import Model",
-                    fluidRow(
-                      column(
-                        12,
-                        uiOutput('ImportModel')
-                        # fileInput('file1', 'Choose CSV File',
-                        #           accept=c('text/csv',
-                        #                    'text/comma-separated-values,text/plain',
-                        #                    '.csv'))
-                        
-                      )
-                    )
-                  ),
-                  box(
-                    width = 12,
-                    title = "Import Data",
-                    fluidRow(
-                      box(
-                        width = 4,
-                        radioButtons('sep', 'Separator',
-                                     c(Comma=',',
-                                       Semicolon=';',
-                                       Tab='\t'),
-                                     ',')
-                      ),
-                      box(
-                        width = 4,
-                        radioButtons('quote', 'Quote',
-                                     c(None='',
-                                       'Double Quote'='"',
-                                       'Single Quote'="'"),
-                                     '"')
-                      ),
-                      box(
-                        width = 4,
-                        checkboxInput('header', 'Header', TRUE)
-                        
+                  # import model
+                  tabBox(
+                    id = "importModelTab",
+                    width = 6,
+                    tabPanel(
+                      "Load Model", icon = icon("upload"), #("file-image-o"),
+                      fluidRow(
+                        box(width = 12,
+                        #     fileInput("importModel", 
+                        #               "Choose Model File",
+                        #               accept = c(
+                        #                 "text/rds",
+                        #                 "text/rda",
+                        #                 "text/RData",
+                        #                 "text/plain",
+                        #                 ".rda",
+                        #                 ".RData",
+                        #                 ".rds"
+                        #               )
+                        #     )
+                        # ),
+                        # column(12, align = "center",
+                        #        actionButton('loadNewModel', 'Load Model', class="goButton", icon = icon("sign-in"))
+                        uiOutput("loadModel")
+                        )
                       )
                     ),
-                    fluidRow(
-                      box(
-                        width = 12,
-                        uiOutput('ImportModelDataset')
-                        # fileInput('file1', 'Choose CSV File',
-                        #           accept=c('text/csv',
-                        #                    'text/comma-separated-values,text/plain',
-                        #                    '.csv'))
-                        
-                      ),
-                      
-                      # allow x-flow for DT:dataTable
-                      shinyjs::inlineCSS(list(
-                        ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-                      )),
-                      tabBox(
-                        width = 12,
-                        tabPanel("Model Data", uiOutput("modelDataTable")),
-                        tabPanel("Summary", verbatimTextOutput("modelDataSummary"))
-                      )
+                    tabPanel(
+                      "Model Preview",
+                      verbatimTextOutput("modelPreview")
                     )
+                  ),
+                  # import data
+                  tabBox(
+                    id = "importDataModelTab",
+                    width = 6,
+                    tabPanel(
+                      "Load Data", icon = icon("upload"),
+                      fluidRow(
+                        box(
+                          width = 12,
+                          # fileInput('loadModelData', 'Choose CSV File',
+                          #           accept=c('text/csv', 
+                          #                    'text/comma-separated-values,text/plain', 
+                          #                    '.csv'))  
+                          uiOutput('loadModelData')
+                        ),
+                        column(4,
+                               checkboxInput('modelHeader', 'Header', TRUE)
+                        ),
+                        column(4,
+                               radioButtons('modelSep', 'Separator',
+                                            c(Comma=',',
+                                              Semicolon=';',
+                                              Tab='\t'),
+                                            ',')
+                        ),
+                        column(4,
+                               radioButtons('modelQuote', 'Quote',
+                                            c(None='',
+                                              'Double Quote'='"',
+                                              'Single Quote'="'"),
+                                            '"')
+                        )
+                      )
+                    ),
+                    # allow x-flow for DT:dataTable
+                    shinyjs::inlineCSS(list(
+                      ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                    )),
+                    tabPanel(
+                      "Model Data", icon = icon("table"),
+                      uiOutput("modelDataTable")
+                    ),
+                    tabPanel(
+                      "Data Summary", icon = icon("file-text-o"),
+                      verbatimTextOutput("modelDataSummary")
+                    )
+                  ),
+                  box(width = 12, align = 'center',
+                      actionButton('runModel', 'Run Model', class="goButton", icon = icon("sign-in")
+                      )
                   )
                 )
               )
