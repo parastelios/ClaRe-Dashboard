@@ -212,5 +212,15 @@ output$modelDataSummary0 <- renderPrint({
 # Run loaded model
 # Event of clicking on runModel0 button
 observeEvent(input$runModel0, {
+  runModelClicked0 = TRUE
+  # TODO: connect to recalculating algo
   
+  # check for results tabs
+  output$isRunModelClicked0 <- reactive({
+    isRunModelClicked0 = runModelClicked0
+    return(isRunModelClicked0)
+  })
+  outputOptions(output, 'isRunModelClicked0', suspendWhenHidden = FALSE)
+  
+  # TODO: print results
 })

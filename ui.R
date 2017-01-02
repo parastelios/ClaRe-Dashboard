@@ -862,21 +862,6 @@ dashboardPage(
                       "Load Model", icon = icon("upload"), #("file-image-o"),
                       fluidRow(
                         box(width = 12,
-                            # fileInput("importModel0", 
-                            #           "Choose Model File",
-                            #           accept = c(
-                            #             "text/rds",
-                            #             "text/rda",
-                            #             "text/RData",
-                            #             "text/plain",
-                            #             ".rda",
-                            #             ".RData",
-                            #             ".rds"
-                            #           )
-                            # )
-                        # ),
-                        # column(12, align = "center",
-                        #        actionButton('loadNewModel0', 'Load Model', class="goButton", icon = icon("sign-in"))
                         uiOutput('loadModel0')
                         )
                       )
@@ -936,6 +921,79 @@ dashboardPage(
                   box(width = 12, align = 'center',
                       actionButton('runModel0', 'Run Model', class="goButton", icon = icon("sign-in")
                       )
+                  )
+                )
+              ),
+              conditionalPanel(
+                'output.isRunModelClicked0',
+                fluidRow(
+                  tabBox(
+                    id = "newModelResults0",
+                    width = 12,
+                    tabPanel(
+                      "Model Summary", icon = icon("file-text-o"),
+                      fluidRow(
+                        # running image
+                        conditionalPanel(
+                          condition="$('html').hasClass('shiny-busy')",
+                          column(12, align = 'center',
+                                 tags$img(src="loading_circle.gif")
+                          )
+                        ),
+                        # model summary  
+                        box(
+                          width = 12,
+                          verbatimTextOutput("featuresStatisticsSummary0") 
+                        )
+                      )
+                    ),
+                    tabPanel(
+                      "Visualize Model", icon = icon("sitemap"), #("file-image-o"),
+                      fluidRow(
+                        # running image
+                        conditionalPanel(
+                          condition="$('html').hasClass('shiny-busy')",
+                          column(12, align = 'center',
+                                 tags$img(src="loading_circle.gif")
+                          )
+                        ),
+                        # visualization
+                        # regression
+                        conditionalPanel(
+                          "output.isRegression0",
+                          box(width = 12,
+                              title = 'Plot: Real target vs Predicted target',
+                              dygraphOutput("targetTargetPlot0")
+                          ),
+                          box(
+                            width = 12,
+                            verbatimTextOutput("modelSummary0") 
+                          )
+                        ),
+                        # classification
+                        conditionalPanel(
+                          "output.isClassification0",
+                          box(
+                            width = 12,
+                            title = "Decision Tree",
+                            plotOutput("decisionTree0")
+                          )
+                        )
+                      )
+                    ),
+                    tabPanel(
+                      tagList(shiny::icon("download"), "Export Model"),
+                      div(
+                        style="text-align:center; padding:30px",
+                        downloadButton("exportModel0",
+                                       label = "Export Model (.rda)")
+                      ),
+                      div(
+                        style="text-align:center; padding:30px",
+                        downloadButton("exportModelData0",
+                                       label = "Export Model Dataset (.csv)")
+                      )
+                    )
                   )
                 )
               )
@@ -1020,31 +1078,38 @@ dashboardPage(
                     tabPanel(
                       "Load Model", icon = icon("upload"), #("file-image-o"),
                       fluidRow(
-                        box(width = 12,
-                        #     fileInput("importModel", 
-                        #               "Choose Model File",
-                        #               accept = c(
-                        #                 "text/rds",
-                        #                 "text/rda",
-                        #                 "text/RData",
-                        #                 "text/plain",
-                        #                 ".rda",
-                        #                 ".RData",
-                        #                 ".rds"
-                        #               )
-                        #     )
-                        # ),
-                        # column(12, align = "center",
-                        #        actionButton('loadNewModel', 'Load Model', class="goButton", icon = icon("sign-in"))
-                        uiOutput("loadModel")
-                        )
+                        column(12, 
+                               checkboxInput('useCurrentModel', HTML('<b>Use current Model</b>'), FALSE)
+                        ),
+                        conditionalPanel(
+                          'output.currentModel',
+                          box(width = 12,
+                              #     fileInput("importModel", 
+                              #               "Choose Model File",
+                              #               accept = c(
+                              #                 "text/rds",
+                              #                 "text/rda",
+                              #                 "text/RData",
+                              #                 "text/plain",
+                              #                 ".rda",
+                              #                 ".RData",
+                              #                 ".rds"
+                              #               )
+                              #     )
+                              # ),
+                              # column(12, align = "center",
+                              #        actionButton('loadNewModel', 'Load Model', class="goButton", icon = icon("sign-in"))
+                              uiOutput("loadModel")
+                              )
+                          )
                       )
                     ),
                     tabPanel(
-                      "Model Preview",
+                      "Model Preview", icon = icon("file-text-o"),
                       verbatimTextOutput("modelPreview")
                     )
                   ),
+                  
                   # import data
                   tabBox(
                     id = "importDataModelTab",

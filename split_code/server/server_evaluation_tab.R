@@ -9,7 +9,7 @@ output$isFeaturesEmpty <- reactive({
 })
 outputOptions(output, 'isFeaturesEmpty', suspendWhenHidden = FALSE)
 
-# checking if features empty
+# checking if features non empty
 output$featuresNonEmpty <- reactive({
   featuresNonEmpty = !is.null(v$features)
   return(featuresNonEmpty)
@@ -131,8 +131,17 @@ observeEvent(input$goClass,{
 #################################################
 #        Import new Model and Data              #
 
+# checking for current model use
+output$currentModel <- reactive({
+  currentModel = !input$useCurrentModel
+  return(currentModel)
+})
+outputOptions(output, 'currentModel', suspendWhenHidden = FALSE)
+
+
 # import Model
 updatemodelInput <- function (name = NULL){
+
   output$loadModel <- renderUI({
     
     index <- isolate(v$loadModel) # re-render
@@ -208,13 +217,22 @@ dataInputModel <- reactive({
 })
 
 # model preview
-output$modelPreview <- renderPrint({
-  model <- dataInputModel()
-  
-  if (is.null(model))
-    return()
-  
-  summary(model)
+observeEvent(input$useCurrentModel,{
+  if (!input$useCurrentModel){
+    output$modelPreview <- renderPrint({
+      model <- dataInputModel()
+
+      if (is.null(model))
+        return()
+
+      summary(model)
+    })
+  }
+  else{
+    output$modelPreview <- renderPrint({
+      summary(model)
+    })
+  }
 })
 
 # import model dataset
@@ -337,7 +355,9 @@ output$modelDataSummary <- renderPrint({
 })
 
 # Run loaded model
-# Event of clicking on runModel0 button
-observeEvent(input$runModel0, {
+# Event of clicking on runModel button
+observeEvent(input$runModel,{
+  # TODO: connect to recalculating algo
+  # TODO: update the tabs with the new results
   
 })
