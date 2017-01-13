@@ -260,8 +260,8 @@ dashboardPage(
                 ),
                 box(width = 4, 
                     title = '3. Create merged Dataset:',
-                    actionButton('merge', 'Merge', class="goButton", icon = icon("arrow-circle-right")),
-                    bsModal("popMerge", "Merging Choices", "merge", size = "large", uiOutput("uiMerging"))
+                    actionButton('merge', 'Merge', class="goButton", icon = icon("arrow-circle-right"))
+                    # bsModal("popMerge", "Merging Choices", "merge", size = "large", uiOutput("uiMerging"))
                        )
               )
             ),
@@ -272,17 +272,11 @@ dashboardPage(
                 box(width = 12, 
                     conditionalPanel(
                       'output.targetIsNull',
-                      column(6,
-                             align = 'center',
-                             h4('The selected Target is empty, please go to Merge tab and create the Merged file with a non-empty Target')
-                              )
+                      bsAlert("noMerged")
                     ),
                     conditionalPanel(
                       'output.targetWithNoNAvalues',
-                      column(6,
-                             align = 'center',
-                             h4('The selected Target has no NA values. You can continue to Modeling or further Pre-processing')
-                              )
+                      bsAlert("noNAs")
                     ),
                     conditionalPanel(
                       "output.isTargetNumeric",
@@ -306,11 +300,9 @@ dashboardPage(
                                                    inline = F)
                                       ),
                                 column(12,
-                                      # align = 'right',
                                       offset = 10,
                                       actionButton('interpolate',
                                                    'Interpolate')
-                                 
                                 )
                              ),
                              conditionalPanel(
@@ -323,9 +315,9 @@ dashboardPage(
                        ),
                     conditionalPanel(
                       "output.isTargetNonNumeric",
-                      column(6, 
+                      column(12, 
                              align = 'center',
-                             h4("The selected target is Non-Numeric, as a result Repeat NA's Policy should be used"),
+                             bsAlert('targetIsNonNumeric'),
                              actionButton('repeating2', 'Repeat')
                       )
                     )
@@ -412,7 +404,9 @@ dashboardPage(
                     ),
                     conditionalPanel(
                       "output.condCheck3",
-                      column(4, align = 'center', h4("The chosen variable has NA values. Manage missing values for options "))
+                      column(8, align = 'center', 
+                             bsAlert('conditionCheck3')
+                      )
                     )
                   )
                 )
@@ -439,16 +433,18 @@ dashboardPage(
               column(3,
                      selectInput('plotY', 'Y Variable(s)', choices = c('Please merge data for options'), multiple = T)
               ),
-              conditionalPanel(
-                'output.classPlotcheckNAs',
-                column(3, h4(htmlOutput('textClassWithNA')))
-              ),
+              
               conditionalPanel(
                 'output.classPlotcheck',
                 column(3, selectInput('plotClass', textOutput('textClassSelector'), choices = c('Select Class'), multiple = T))
               ),
               column(1, align = 'right',
                      actionButton('preProsPlot', 'Plot', class="goButton", icon = icon("arrow-circle-right"))
+              ),
+              conditionalPanel(
+                'output.classPlotcheckNAs',
+                column(3, align = 'center',
+                       bsAlert('plotNAs'))
               ),
               conditionalPanel(
                 'output.simplePlotCheck',
@@ -502,14 +498,7 @@ dashboardPage(
         fluidRow(
           box(width = 12,
               align = 'center',
-              title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i> 
-                            For more options choose your target variable'),
-              h4(
-              HTML('<b>Go to:</b>'),
-              HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                    <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                    <i>"Choose your target variable"</i></p>')
-              )
+              bsAlert('modelEmpty')
           )
         )
       ),
@@ -518,6 +507,19 @@ dashboardPage(
         fluidRow(
           box(width = 12,
               title = 'Regression',
+              
+              conditionalPanel(
+                'output.targetStillWithNAReg',
+                column(12,
+                       bsAlert('targetWithNAReg')
+                )
+              ),
+              conditionalPanel(
+                'output.targetConstantReg',
+                column(12,
+                       bsAlert('targetIsConstantReg')
+                )
+              ),
               column(3,
                      column(12,
                             h5(strong('Predictors sampling rate is:')),
@@ -559,18 +561,6 @@ dashboardPage(
                        column(12, align = 'right',
                               actionButton('goReg', 'Go', class="goButton", icon = icon("arrow-circle-right"))
                        )
-                )
-              ),
-              conditionalPanel(
-                'output.targetStillWithNAReg',
-                column(3,
-                       h4('The selected Target has NA values, go to Pre-processing Tab to Manage Missing values')
-                  )
-              ),
-              conditionalPanel(
-                'output.targetConstantReg',
-                column(3,
-                       h4('The selected Target is constant and cannot be predicted, please choose another target')
                 )
               )
           ),
@@ -678,6 +668,18 @@ dashboardPage(
         fluidRow(
           box(width = 12,
               title = 'Classification',
+              conditionalPanel(
+                'output.targetStillWithNAClass',
+                column(12,
+                       bsAlert('targetWithNAClass')
+                )
+              ),
+              conditionalPanel(
+                'output.targetConstantClass',
+                column(12,
+                       bsAlert('targetIsConstantClass')
+                )
+              ),
               column(3,
                      h5(strong('Predictors sampling rate is:')),
                      box(width = 5,
@@ -711,18 +713,6 @@ dashboardPage(
                 'output.targetWithoutNAClass',
                 column(12, align = 'right',
                        actionButton('goClass', 'Go', class="goButton", icon = icon("arrow-circle-right"))
-                )
-              ),
-              conditionalPanel(
-                'output.targetStillWithNAClass',
-                column(3, align = 'center',
-                       h4('The selected Target has NA values. Please go to: Pre-processing Tab to Manage Missing values')
-                )
-              ),
-              conditionalPanel(
-                'output.targetConstantClass',
-                column(3,
-                       h4('The selected Target is constant and cannot be predicted, please choose another target')
                 )
               )
           ),
@@ -838,16 +828,9 @@ dashboardPage(
                 "Create Model", icon = icon("info"),
                 fluidRow(
                   align = 'center',
-                  column(6, 
-                    # align = 'center',
-                    h4(
-                      HTML('<b>Go to:</b>'),
-                      HTML('<p><i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                           <i>"Merge "</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                           <i>"Choose your target variable"</i></p>'),
-                      HTML('<b>And then:</b>'),
-                      HTML('<p><i>"Model (Regression or Classification) "</i></p>')
-                      )
+                  column(12, 
+                    align = 'center',
+                    bsAlert('createModel')
                     )
                 )
               ),
@@ -1177,10 +1160,10 @@ dashboardPage(
         tabName = 'about',
         fluidRow(  
           box(
-            title = "About",
+            title = HTML('<i class="fa fa-info-circle" aria-hidden="true"></i>About'),
             width = 12,
             HTML('<p>Acordion Dashboard aims to provide toolkits to explore datasets in a visualized way, especially for time-series datasets. It includes dataset uploading, pre-processing (merge, manage missing values, plot etc.), modeling (regression, classification), evaluation (model summary, visualization, export-import model)  which offer handy access of different methods and parameters applied to your data.</p>'),
-            HTML('<p>Author: Ricardo Cachucho <a href="mailto:r.cachucho@liacs.leidenuniv.nl">r.cachucho@liacs.leidenuniv.nl</a>, Stylianos Paraschiakos <a href="mailto: s.paraschiakos@umail.leidenuniv.nl"> s.paraschiakos@umail.leidenuniv.nl</a></p>')
+            HTML('<p>Authors: Ricardo Cachucho <a href="mailto:r.cachucho@liacs.leidenuniv.nl">r.cachucho@liacs.leidenuniv.nl</a>, Stylianos Paraschiakos <a href="mailto: s.paraschiakos@umail.leidenuniv.nl"> s.paraschiakos@umail.leidenuniv.nl</a></p>')
           )
         )
       )

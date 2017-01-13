@@ -10,11 +10,29 @@ output$targetIsNull <- reactive({
 })
 outputOptions(output, 'targetIsNull', suspendWhenHidden = FALSE)
 
+createAlert(session, 'noMerged', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> The files are not merged ', 
+            content = HTML('<p><b>Go to:</b>
+                            <i>"Merge Tab"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                            <i><b>Choose</b> merge options and target variable and</i>
+                            <i class="fa fa-long-arrow-right" aria-hidden="true"></i><i>"Merge"</i></p>'),
+            append = F
+            # style = 'warning'
+            )
+
 output$targetWithNoNAvalues <- reactive({
   targetWithNoNAvalues = (!anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
   return(targetWithNoNAvalues)
 })
 outputOptions(output, 'targetWithNoNAvalues', suspendWhenHidden = FALSE)
+
+createAlert(session, 'noNAs', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> 
+                    The selected Target has no NA values. 
+                    Continue to <i>Modeling</i> or further <i>Pre-processing</i>',
+            append = F
+            # style = 'warning'
+            )
 
 output$isTargetNumeric <- reactive({
   isTargetNumeric = (is.numeric(v$data[,ncol(v$data)]) && anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
@@ -28,7 +46,12 @@ output$isTargetNonNumeric <- reactive({
 })
 outputOptions(output, 'isTargetNonNumeric', suspendWhenHidden = FALSE)
 
-
+createAlert(session, 'targetIsNonNumeric', 
+            title = "<i class='fa fa-info-circle' aria-hidden='true'></i> 
+            The selected target is Non-Numeric, as a result <i>Repeat</i> NA's Policy should be used.",
+            append = F
+            # style = 'warning'
+)
 
 ########## Interpolate ##########
 

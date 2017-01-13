@@ -7,32 +7,38 @@ observeEvent(input$confirmMerging, {
   predField = input$predictorField
   tarField = input$targetField
   tarOption = input$targetOption
-  toggleModal(session, "popMerge")
   v$data = mergeData(v$data_pre, v$data_tar, predField, tarField, tarOption, input$excludingPre)
   v$d_colNA = getColWithNAEntries(v$data)
   renderMergedDataTable(v$data) 
+  removeModal()
 })
 
 # Confirm options for merge
-output$uiMerging <- renderUI({
-  tempPreFieldText <- input$predictorField
-  tempTarFieldText <- input$targetField
-  tempTargetChoiceText <- input$targetOption
+observeEvent(input$merge, {
+  output$predictorField <- renderText(input$predictorField)
+  output$targetField <- renderText(input$targetField)
+  output$targetOption <- renderText(input$targetOption)
+  
+  parseExcludingFieldsToHTMLTable <- function(x) {
+    result = '<table class="table"><thead style="display: block;"><tr><th>Excluded fields:</th></tr></thead><tbody style=
+    "height: 100px; overflow: auto; display: block">'
+    for (i in x) {
+      result = paste(result, '<tr><td>', i, '</td></tr>');
+    }
+    result = paste(result, '</tbody></table>')
+    return(result)
+  }
+  
   if(is.null(input$excludingPre)){
-    tempRemoveText <- 'None'
+    text = HTML("None")
+    output$showPredictorsRemoved <- renderText(parseExcludingFieldsToHTMLTable(text))
   }
   else{
-    tempRemoveText <- input$excludingPre
+    output$showPredictorsRemoved <- renderText(parseExcludingFieldsToHTMLTable(input$excludingPre))
   }
-  output$showMergingVar <- renderText({
-    paste("<b>", "Columns to be merged:", "</b>", toString(c(tempTarFieldText, tempPreFieldText)))
-  })
-  output$showTargetChoice <- renderText({
-    paste("<b>", "Selected Target:", "</b>", toString(tempTargetChoiceText)) 
-  })
   if(input$targetOption == input$targetField){
     output$targetWarning <- renderText({
-      paste("<b>", 'Warning: Target is the same with the target Merge-field !', "</b>")
+      paste("Warning: Target is the same with the target Merge-field !")
     })
   }
   else{
@@ -40,20 +46,46 @@ output$uiMerging <- renderUI({
       paste('')
     })
   }
-  output$showPredictorsRemoved <- renderText({
-    paste("<b>","Predictors to be removed:", "</b>", toString(tempRemoveText))
-  })
-  div(
-    style = "text-align:center",
-    tags$h4(htmlOutput("targetWarning")),
-    tags$h4(htmlOutput("showMergingVar")),
-    tags$h4(htmlOutput("showTargetChoice")),
-    tags$h4(htmlOutput("showPredictorsRemoved")),
-    bsButton('confirmMerging', 'Confirm Merging', style = "primary")
-  )
-  
+  showModal(modalDialog(
+    title = "Merging Choices",
+    div(
+      style='color: red; text-align:center',
+      tags$h4(htmlOutput("targetWarning"))
+    ),
+    div(
+      tags$table(
+        class="table",
+        tags$thead(
+          tags$th('Columns to be merged:')
+        ),
+        tags$tbody(
+          tags$tr(
+            tags$td(textOutput('predictorField'), textOutput('targetField'))
+          )
+        )
+      ),
+      tags$table(
+        class="table",
+        tags$thead(
+          tags$th('Selected target:')
+        ),
+        tags$tbody(
+          tags$tr(
+            tags$td(textOutput('targetOption'))
+          )
+        )
+      )
+    ),
+    div(
+      htmlOutput('showPredictorsRemoved')
+    ),
+    footer = tagList(
+      modalButton("Cancel"),
+      bsButton('confirmMerging', 'Confirm Merging', style = "success")
+    ),
+    easyClose = FALSE
+  ))
 })
-
 
 mergeData <- function(preData, tarData, fieldA, fieldB, target, excludingPredictors) {
   # merge

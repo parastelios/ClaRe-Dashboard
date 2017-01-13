@@ -13,15 +13,23 @@ output$classPlotcheckNAs <- reactive({
   isTargetNonNumeric = (!is.numeric(v$data[1,target]) 
                         && sum(is.na(v$data[,target]))>0
                         && target %in% input$plotY)
-  output$textClassWithNA <- renderText({
-    n = target
-    if(n=='Please select Target'){
-      paste('Merge for Options')
-    }
-    else{
-      paste("<b>", n, "</b>", ' Non-numeric with NA values, go to', "<i>", 'Manage missing values',"</i>", ' tab')
-    }
-  })
+  n = target
+  if(n =='Please select Target'){
+    createAlert(session, 'plotNAs',
+                title = 'Merge for Options',
+                append = F
+    )
+  }
+  else{
+    text = paste('<i class="fa fa-info-circle" aria-hidden="true"></i> <i>"', target, '"</i> non-numeric with NA values')
+    createAlert(session, 'plotNAs', 
+                title = text,
+                content = HTML('<p> To plot classes, manage missing values</i> '),
+                append = F,
+                style = 'warning'
+    )
+  }
+
   return(isTargetNonNumeric)
 })
 outputOptions(output, 'classPlotcheckNAs', suspendWhenHidden = FALSE)
@@ -101,7 +109,7 @@ get_preProsPlot <- function(type, data, varX, varY){
         else{
           target <- cbind(d[c(varX,varY)])
         }
-
+        # print(target)
         g <- dygraph(target)%>%
           dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
 
@@ -138,8 +146,14 @@ get_preProsPlot <- function(type, data, varX, varY){
                     check = (x == l[j,3])
                   }
                   if (check){
-                    g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
-                      dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
+                    if(varX == 'DataIndex'){
+                      g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
+                        dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                    }
+                    if(varX == colnames(v$data)[1]){
+                      g<-dyShading(g, from = v$data[l[j,1],1], to = v$data[l[j,2],1], color = colors[k %% colorMax+1])%>%
+                        dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                    }
                   }
                 }
                 k = k + 1
@@ -241,9 +255,14 @@ get_preProsPlot <- function(type, data, varX, varY){
                       check = (x == l[j,3])
                     }
                     if (check){
-                      g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
-                        # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>%
-                        dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
+                      if(varX == 'DataIndex'){
+                        g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
+                          dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                      }
+                      if(varX == colnames(v$data)[1]){
+                        g<-dyShading(g, from = v$data[l[j,1],1], to = v$data[l[j,2],1], color = colors[k %% colorMax+1])%>%
+                          dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                      }
                     }
                   }
                   k = k + 1

@@ -1,6 +1,18 @@
 ###################################################
 #######           Evaluation Tab 0         ########
 ###################################################
+# info modal
+createAlert(session, 'createModel', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> For more options:', 
+            content = HTML('<p><b>Go to:</b>
+                            <i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                            <i>"Merge"</i></p> 
+                            <p>Choose your merge options/target variable and run <i>"Merge"</i></p>
+                            <p><b> And then:</b></p>
+                            <p><i> "Model(Regression or Classification)"</i></p>'),
+            append = F
+            # style = 'warning'
+)
 
 # import Model
 updatemodelInput0 <- function (name = NULL){

@@ -13,6 +13,16 @@ output$selectmodeling <- renderMenu({
   }
 })
 
+createAlert(session, 'modelEmpty', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> For more options:', 
+            content = HTML('<p><b>Go to:</b>
+                            <i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                            <i>"Merge"</i></p> 
+                            <p>Choose your merge options/target variable and run <i>"Merge"</i></p>'),
+            append = F
+            # style = 'warning'
+)
+
 # event of merging creates options for the models (regression/classification)
 observeEvent(input$confirmMerging,{
   # print(input$maxWindowClass)

@@ -7,13 +7,33 @@ output$targetStillWithNAClass <- reactive({
   return(targetStillWithNAClass)
 })
 outputOptions(output, 'targetStillWithNAClass', suspendWhenHidden = FALSE)
-
+createAlert(session, 'targetWithNAClass', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> The selected Target has NA values!', 
+            content = HTML('<p><b>Go to:</b>
+                           <i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                           <i>"Manage Missing values"</i></p>'), 
+            
+            append = F,
+            style = 'warning'
+            )
 # checking if target is constant
 output$targetConstantClass <- reactive({
   targetConstantClass = (length(unique(v$data[,ncol(v$data)]))==1 && !anyNA(v$data[,ncol(v$data)]) && !is.null(v$data[,ncol(v$data)]))
   return(targetConstantClass)
 })
 outputOptions(output, 'targetConstantClass', suspendWhenHidden = FALSE)
+createAlert(session, 'targetIsConstantClass', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> The selected Target is constant 
+            and it cannot be predicted, please choose another target', 
+            content = HTML('<p><b>Go to:</b>
+                           <i>"Pre processing"</i> <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                           <i>"Merge"</i></p>
+                           <p>Choose your merge options/target variable and run again <i>"Merge"</i></p>'), 
+            
+            append = F,
+            style = 'warning'
+            )
+
 
 # checking if target can be predicted
 output$targetWithoutNAClass <- reactive({
@@ -204,8 +224,14 @@ get_featuresClassPlot <- function(type, data, varX, varY){
                 check = (x == l[j,3])
               }
               if (check){
-                g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
-                  dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
+                if(varX == 'DataIndex'){
+                  g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
+                    dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                }
+                if(varX == colnames(v$data)[1]){
+                  g<-dyShading(g, from = v$data[l[j,1],1], to = v$data[l[j,2],1], color = colors[k %% colorMax+1])%>%
+                    dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                }
               }
             }
             k = k + 1
@@ -299,9 +325,14 @@ get_featuresClassPlot <- function(type, data, varX, varY){
                     check = (x == l[j,3])
                   }
                   if (check){
-                    g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
-                      # dyAnnotation(l[j,1], l[j,3], attachAtBottom = TRUE, width = 60)%>%
-                      dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
+                    if(varX == 'DataIndex'){
+                      g<-dyShading(g, from = l[j,1], to = l[j,2], color = colors[k %% colorMax+1])%>%
+                        dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                    }
+                    if(varX == colnames(v$data)[1]){
+                      g<-dyShading(g, from = v$data[l[j,1],1], to = v$data[l[j,2],1], color = colors[k %% colorMax+1])%>%
+                        dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)  
+                    }
                   }
                 }
                 k = k + 1

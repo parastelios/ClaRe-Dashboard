@@ -206,3 +206,9 @@ output$condCheck3 <- reactive({
   return(a3)
 })
 outputOptions(output, 'condCheck3', suspendWhenHidden = FALSE)
+
+createAlert(session, 'conditionCheck3', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> The chosen variable has NA values.', 
+            content = HTML('<p><b>Go to:</b> <i>"Manage missing values"</i> for options'),
+            append = F
+)
