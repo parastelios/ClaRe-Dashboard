@@ -520,39 +520,39 @@ dashboardPage(
                        bsAlert('targetIsConstantReg')
                 )
               ),
-              column(3,
-                     column(12,
-                            h5(strong('Predictors sampling rate is:')),
-                            box(width = 8,
-                                align = 'center',
-                                h4(uiOutput('preSampleRateReg'))
-                            )
-                     )
-              ),
-              column(3,
-                     # h5(strong('Give Target sampling rate:')),
-                     numericInput('tarSampleRateReg',
-                                  label = 'Give Target sampling rate:',
-                                  min = 0, max = 1,
-                                  value = 1, 
-                                  step = 0.005)
-              ),
-              column(3,
-                     column(12,
-                            # h5(strong('Choose Number of samples:')),
-                            numericInput('numOfSamplesReg',
-                                         label = 'Choose Number of samples:',
-                                         value = 10
-                            )
-                     ),
-                     column(12,
-                            numericInput("maxWindowReg", 
-                                         label = "Choose Max window size:",
-                                         min = 0, max = 20, value = 15, step = 1)
-                     )
-              ),
               conditionalPanel(
                 'output.targetWithoutNAReg',
+                column(3,
+                       column(12,
+                              h5(strong('Predictors sampling rate is:')),
+                              box(width = 8,
+                                  align = 'center',
+                                  h4(uiOutput('preSampleRateReg'))
+                              )
+                       )
+                ),
+                column(3,
+                       # h5(strong('Give Target sampling rate:')),
+                       numericInput('tarSampleRateReg',
+                                    label = 'Give Target sampling rate:',
+                                    min = 0, max = 1,
+                                    value = 1, 
+                                    step = 0.005)
+                ),
+                column(3,
+                       column(12,
+                              # h5(strong('Choose Number of samples:')),
+                              numericInput('numOfSamplesReg',
+                                           label = 'Choose Number of samples:',
+                                           value = 10
+                              )
+                       ),
+                       column(12,
+                              numericInput("maxWindowReg", 
+                                           label = "Choose Max window size:",
+                                           min = 0, max = 20, value = 15, step = 1)
+                       )
+                ),
                 column(3, 
                        radioButtons('regressionMethod', 'Choose Regression Method',
                                     c(Linear = 'linearReg',
@@ -680,39 +680,38 @@ dashboardPage(
                        bsAlert('targetIsConstantClass')
                 )
               ),
-              column(3,
-                     h5(strong('Predictors sampling rate is:')),
-                     box(width = 5,
-                         align = 'center',
-                         h4(uiOutput('preSampleRateClass'))
-                     )
-              ),
-              column(3,
-                     # h5(strong('Give Target sampling rate:')),
-                     numericInput('tarSampleRateClass',
-                                  label = 'Give Target sampling rate:',
-                                  min = 0, max = 1,
-                                  value = 1, 
-                                  step = 0.005)
-              ),
-              column(3,
-                     column(12,
-                            # h5(strong('Choose Number of samples:')),
-                            numericInput('numOfSamplesClass',
-                                         label = 'Choose Number of samples:',
-                                         value = 10
-                            )
-                     ),
-                     column(12,
-                            numericInput("maxWindowClass", 
-                                         label = "Choose Max window size:",
-                                         min = 0, max = 20, value = 15, step = 1)
-                     )
-              ),
               conditionalPanel(
                 'output.targetWithoutNAClass',
-                column(12, align = 'right',
-                       actionButton('goClass', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                column(3,
+                       h5(strong('Predictors sampling rate is:')),
+                       box(width = 5,
+                           align = 'center',
+                           h4(uiOutput('preSampleRateClass'))
+                       )
+                ),
+                column(3,
+                       # h5(strong('Give Target sampling rate:')),
+                       numericInput('tarSampleRateClass',
+                                    label = 'Give Target sampling rate:',
+                                    min = 0, max = 1,
+                                    value = 1, 
+                                    step = 0.005)
+                ),
+                column(3,
+                       column(12,
+                              # h5(strong('Choose Number of samples:')),
+                              numericInput('numOfSamplesClass',
+                                           label = 'Choose Number of samples:',
+                                           value = 10
+                              )
+                       ),
+                       column(12,
+                              numericInput("maxWindowClass", 
+                                           label = "Choose Max window size:",
+                                           min = 0, max = 20, value = 15, step = 1)
+                       )
+                ),column(12, align = 'right',
+                         actionButton('goClass', 'Go', class="goButton", icon = icon("arrow-circle-right"))
                 )
               )
           ),

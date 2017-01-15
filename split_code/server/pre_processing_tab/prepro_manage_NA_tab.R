@@ -29,7 +29,7 @@ outputOptions(output, 'targetWithNoNAvalues', suspendWhenHidden = FALSE)
 createAlert(session, 'noNAs', 
             title = '<i class="fa fa-info-circle" aria-hidden="true"></i> 
                     The selected Target has no NA values. 
-                    Continue to <i>Modeling</i> or further <i>Pre-processing</i>',
+                    Continue to further <i>"Pre-processing"</i> or <i>"Modeling"</i>',
             append = F
             # style = 'warning'
             )
