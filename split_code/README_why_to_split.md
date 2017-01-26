@@ -1,0 +1,3 @@
+# Split app code across multiple files (when codebase is large)
+
+When creating Shiny apps with a lot of code and a complex UI, it can sometimes get very messy and difficult to maintain your code when it's all in one file. What you can do instead is have one "main" UI and "main" server and split your UI and server code into multiple files. This can make code much more manageable and easier to develop when it grows large. You can split the code however you want, but I usually like to split it logically: for example, if my app has 5 tabs then the server code for each tab would be in its own file. However, for this project I keep the UI code in one file.

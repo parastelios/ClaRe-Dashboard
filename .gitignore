@@ -5,3 +5,5 @@ data_arcodium/
 .Rproj.user/
 demo.R
 speedEstimation.R
+ClassModelData-*
+ClassificationModel-*
