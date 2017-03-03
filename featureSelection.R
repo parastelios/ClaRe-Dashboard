@@ -5,7 +5,7 @@
 
 
 ###############################################################################
-#######################FEATURE SELECTION: DECIOSION TREES######################
+#######################FEATURE SELECTION: DECISION TREES######################
 embeddedGainRatioFS <- function(DData, IData, AIData, PParameter)
 {
   if(is.numeric(DData) == TRUE)

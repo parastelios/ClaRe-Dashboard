@@ -60,7 +60,7 @@ observeEvent(input$numOfSamplesClass,{
   if(is.null(v$preRate)) {
     v$preRate <- 1
   }
-  v$maxWinClass <- v$preRate*(input$numOfSamplesClass)
+  v$maxWinClass <- as.integer(v$preRate*(input$numOfSamplesClass))
   updateNumericInput(session, "maxWindowClass",
                      value = v$maxWinClass,
                      min = 0, max = 10*(v$maxWinClass), step = 1)

@@ -16,8 +16,8 @@ library(CORElearn)
 library(RWeka)
 library(rJava)
 
-# change maximum file size from 5MB to 100MB
-options(shiny.maxRequestSize = 100*1024^2)
+# change maximum file size from 5MB to 1GB
+options(shiny.maxRequestSize = 1000*1024^2)
 
 # global settings
 DEBUG_UPLOAD_ON  = F
@@ -25,6 +25,13 @@ predictorFile = './data_arcodium/runPre_sub1.csv'
 # predictorFile = './data_arcodium/snowPredictors.csv'
 targetFile = './data_arcodium/runTar_sub1.csv'
 # targetFile = './data_arcodium/snowTarget.csv'
+
+# Load merged file by dir
+LOAD_MERGED = F
+mergedFile = './mergedFile.csv'
+
+# Save model option by run
+SAVE_MODEL = T
 
 # variable names
 AD_GENERAL = 'AD2016General'

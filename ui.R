@@ -523,12 +523,10 @@ dashboardPage(
               conditionalPanel(
                 'output.targetWithoutNAReg',
                 column(3,
-                       column(12,
-                              h5(strong('Predictors sampling rate is:')),
-                              box(width = 8,
-                                  align = 'center',
-                                  h4(uiOutput('preSampleRateReg'))
-                              )
+                       h5(strong('Predictors sampling rate is:')),
+                       box(width = 12,
+                           align = 'center',
+                           h4(uiOutput('preSampleRateReg'))
                        )
                 ),
                 column(3,
@@ -684,7 +682,7 @@ dashboardPage(
                 'output.targetWithoutNAClass',
                 column(3,
                        h5(strong('Predictors sampling rate is:')),
-                       box(width = 5,
+                       box(width = 12,
                            align = 'center',
                            h4(uiOutput('preSampleRateClass'))
                        )

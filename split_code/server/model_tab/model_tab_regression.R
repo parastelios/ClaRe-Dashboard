@@ -14,7 +14,7 @@ output$targetStillWithNAReg <- reactive({
   return(targetStillWithNAReg)
 })
 outputOptions(output, 'targetStillWithNAReg', suspendWhenHidden = FALSE)
-
+#info window
 createAlert(session, 'targetWithNAReg', 
             title = '<i class="fa fa-info-circle" aria-hidden="true"></i> The selected Target has NA values!', 
             content = HTML('<p><b>Go to:</b>
@@ -31,7 +31,7 @@ output$targetConstantReg <- reactive({
   return(targetConstantReg)
 })
 outputOptions(output, 'targetConstantReg', suspendWhenHidden = FALSE)
-
+#info window
 createAlert(session, 'targetIsConstantReg', 
             title = '<i class="fa fa-info-circle" aria-hidden="true"></i> The selected Target is constant 
                       and it cannot be predicted, please choose another target', 
@@ -71,7 +71,7 @@ observeEvent(input$numOfSamplesReg,{
     v$preRate <- 1
   }
   # print(v$preRate)
-  v$maxWinReg <- v$preRate*(input$numOfSamplesReg)
+  v$maxWinReg <- as.integer(v$preRate*(input$numOfSamplesReg))
   updateNumericInput(session, "maxWindowReg",
                      value = v$maxWinReg,
                      min = 0, max = 10*v$maxWinReg, step = 1)

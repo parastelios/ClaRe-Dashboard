@@ -61,6 +61,13 @@ observeEvent(input$goReg,{
   
   # export model
   print(model)
+  if (SAVE_MODEL == T) {
+    filename = function() {
+      paste('RegressiontionModel-', Sys.time(), '.rda', sep='')
+    }
+    save(model, PParameterClass, file = file)
+  } 
+  
   output$exportModel <- downloadHandler(
     filename = function() {
       paste('RegressiontionModel-', Sys.time(), '.rda', sep='')
@@ -100,11 +107,19 @@ observeEvent(input$goClass,{
   # plot decision tree
   # TODO: make it look nicer
   output$decisionTree <- renderPlot({
-    plot( model)
+    plot(model)
   })
   
   # export model
   print(model)
+  plot(model)
+  if (SAVE_MODEL == T) {
+    filename = function() {
+      paste('ClassificationModel-', Sys.time(), '.rda', sep='')
+    }
+    save(model, PParameterClass, file = file)
+  } 
+
   output$exportModel <- downloadHandler(
     filename = function() {
       paste('ClassificationModel-', Sys.time(), '.rda', sep='')
