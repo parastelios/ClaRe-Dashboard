@@ -1,6 +1,6 @@
 data_arcodium/
 *.RData
-*.Rproj
+
 .Rhistory
 .Rproj.user/
 demo.R
