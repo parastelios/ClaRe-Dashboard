@@ -62,10 +62,8 @@ observeEvent(input$goReg,{
   # export model
   print(model)
   if (SAVE_MODEL == T) {
-    filename = function() {
-      paste('RegressiontionModel-', Sys.time(), '.rda', sep='')
-    }
-    save(model, PParameterClass, file = file)
+    save(model, PParameterClass, file = 'model.rda')
+    load(file = 'model.rda')  
   } 
   
   output$exportModel <- downloadHandler(
@@ -113,11 +111,11 @@ observeEvent(input$goClass,{
   # export model
   print(model)
   plot(model)
+  
+  #save model in workspace and 
   if (SAVE_MODEL == T) {
-    filename = function() {
-      paste('ClassificationModel-', Sys.time(), '.rda', sep='')
-    }
-    save(model, PParameterClass, file = file)
+    save(model, PParameterClass, file = 'model.rda')
+    load(file = 'model.rda')  
   } 
 
   output$exportModel <- downloadHandler(
