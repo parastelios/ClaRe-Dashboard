@@ -70,5 +70,5 @@ shinyServer(function(input, output, session) {
   source('featureConstruction.R')
   
   # Automatically stop a Shiny app when closing the browser tab (http://deanattali.com/blog/advanced-shiny-tips/)
-  session$onSessionEnded(stopApp)  
+  #session$onSessionEnded(stopApp)  
 })

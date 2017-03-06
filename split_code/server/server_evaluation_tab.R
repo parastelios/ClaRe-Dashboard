@@ -35,13 +35,14 @@ outputOptions(output, 'isClassification', suspendWhenHidden = FALSE)
 observeEvent(input$goReg,{
   # build regression model
   model <- lm(DData ~ ., data=v$features)
-  print(summary.lm(model)) 
+  v$model <- model
+  print(summary.lm(v$model)) 
   PParameterReg <- v$PParameterReg
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
       return()
     else
-      summary.lm(model)
+      summary.lm(v$model)
   })
   v$predicted_target <- predict(model)
   # plot predicted vs real target with dygraphs
@@ -60,11 +61,10 @@ observeEvent(input$goReg,{
   })
   
   # export model
-  print(model)
+  print(v$model)
   if (SAVE_MODEL == T) {
-    save(model, PParameterClass, file = 'model.rda')
-    load(file = 'model.rda')  
-  } 
+    save(model, PParameterReg, file = 'model.rda')
+  }
   
   output$exportModel <- downloadHandler(
     filename = function() {
@@ -92,15 +92,16 @@ observeEvent(input$goReg,{
 observeEvent(input$goClass,{
   # Train decision tree and record accuracy
   model <- J48(DData ~ ., data=v$features)
-  .jcache(model$classifier)
-  print(summary(model, numFolds = 10))
+  v$model <- model
+  .jcache(v$model$classifier)
+  print(summary(model, numFolds = 10, seed = 17))
   PParameterClass <- v$PParameterClass
   # print(model)
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
       return()
     else
-      summary(model, numFolds = 10)
+      summary(model, numFolds = 10, seed = 17)
   })
   # plot decision tree
   # TODO: make it look nicer
@@ -109,15 +110,14 @@ observeEvent(input$goClass,{
   })
   
   # export model
-  print(model)
-  plot(model)
+  print(v$model)
+  plot(v$model)
   
   #save model in workspace and 
   if (SAVE_MODEL == T) {
     save(model, PParameterClass, file = 'model.rda')
-    load(file = 'model.rda')  
   } 
-
+  
   output$exportModel <- downloadHandler(
     filename = function() {
       paste('ClassificationModel-', Sys.time(), '.rda', sep='')
@@ -154,7 +154,7 @@ outputOptions(output, 'currentModel', suspendWhenHidden = FALSE)
 
 # import Model
 updatemodelInput <- function (name = NULL){
-
+  
   output$loadModel <- renderUI({
     
     index <- isolate(v$loadModel) # re-render
@@ -206,8 +206,8 @@ dataInputModel <- reactive({
   Model_inFile <- input[[paste0('modelFile', v$loadModel)]]
   
   if (is.null(Model_inFile)){
-    # return(NULL)
-    return(v$model)
+    return()
+    # return(v$model)
   }
   
   load(Model_inFile$datapath)
@@ -234,16 +234,23 @@ observeEvent(input$useCurrentModel,{
   if (!input$useCurrentModel){
     output$modelPreview <- renderPrint({
       model <- dataInputModel()
-
+      
       if (is.null(model))
         return()
-
-      summary(model)
+      if (is.numeric(v$features[,"DData"])) {
+        summary(model)  
+      }
+      else
+        summary(model, numFolds = 10, seed = 17)
     })
   }
   else{
     output$modelPreview <- renderPrint({
-      summary(model)
+      if (is.numeric(v$features[,"DData"])) {
+        summary(v$model)
+      }
+      else
+        summary(v$model, numFolds = 10, seed = 17)
     })
   }
 })
