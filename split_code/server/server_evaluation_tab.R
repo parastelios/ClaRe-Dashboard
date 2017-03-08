@@ -93,7 +93,7 @@ observeEvent(input$goClass,{
   # Train decision tree and record accuracy
   model <- J48(DData ~ ., data=v$features)
   v$model <- model
-  .jcache(v$model$classifier)
+  .jcache(model$classifier)
   print(summary(model, numFolds = 10, seed = 17))
   PParameterClass <- v$PParameterClass
   # print(model)

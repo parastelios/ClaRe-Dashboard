@@ -34,14 +34,17 @@ observeEvent(input$confirmMerging,{
   v$preRate <- v$AIData$Sampling.Rate
   
   # target rate
-  tarLocalSR <- 1/diff(v$data_tar[,input$targetField]/1000)
+    tarLocalSR <- 1/diff(v$data_tar[,input$targetField]/1000)
   v$tarRate <- median(tarLocalSR)
+  if (v$tarRate > 1){
+    v$tarRate <- 1
+  }
   
   # update the regression options after merge
   updateNumericInput(session, "tarSampleRateReg",
                      value = v$tarRate, 
                      min = 0, max = v$preRate, step = 0.005)  
-  v$maxWinReg <- v$preRate*(input$numOfSamplesReg)
+  v$maxWinReg <- as.integer(v$preRate*(input$numOfSamplesReg))
   updateNumericInput(session, "maxWindowReg",
                     value = v$maxWinReg,
                     min = 0, max = 10*(v$maxWinReg), step = 1)
@@ -52,7 +55,7 @@ observeEvent(input$confirmMerging,{
                      # label = 'Give Target sampling rate:',
                      value = v$tarRate, 
                      min = 0, max = v$preRate, step = 0.005)
-  v$maxWinClass <- v$preRate*(input$numOfSamplesClass)
+  v$maxWinClass <- as.integer(v$preRate*(input$numOfSamplesClass))
   updateNumericInput(session, "maxWindowClass",
                     value = v$maxWinClass,
                     min = 0, max = 10*v$maxWinClass, step = 1)

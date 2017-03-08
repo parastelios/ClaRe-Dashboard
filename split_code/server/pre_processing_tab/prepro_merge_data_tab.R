@@ -91,10 +91,10 @@ mergeData <- function(preData, tarData, fieldA, fieldB, target, excludingPredict
   # merge
   dPre = preData[,c(setdiff(colnames(preData), excludingPredictors))]
   dTar = tarData[, c(fieldB, target)]
-  if (LOAD_MERGED == T) {
-    d_merged = data.frame(read.csv(mergedFile))
-  }
-  else
+  # if (LOAD_MERGED == T) {
+  #   d_merged = data.frame(read.csv(mergedFile))
+  # }
+  # else
     d_merged = merge(dPre, dTar, by.x=fieldA, by.y=fieldB, all=TRUE)
   # rename the columns with same name between Predictors and Target
   # sameColNames = intersect(colnames(dPre), colnames(dTar))
