@@ -101,8 +101,9 @@ observeEvent(input$goReg,{
     print('lag')
     v$features <- embedded.CCF.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg) 
   }
-
-  print(summary(v$features))
+  timestamp <- v$data[aTarIndex,1]
+  v$features <- cbind(timestamp, v$features)
+  # print(summary(v$features))
   renderFeaturesRegDataTable(v$features)
 })
 

@@ -82,7 +82,9 @@ observeEvent(input$goClass,{
   # Run accordion
   v$features <- embeddedGainRatioFS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterClass)
   
-  print(summary(v$features))
+  timestamp <- v$data[aTarIndex,1]
+  v$features <- cbind(timestamp, v$features)
+  # print(summary(v$features))
   renderFeaturesClassDataTable(v$features)
 })
 

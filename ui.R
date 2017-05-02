@@ -243,10 +243,10 @@ dashboardPage(
                 box(width = 4, 
                     title = '1. Select Merge Fields:',
                     column(12,
-                           selectInput('targetField', 'Target', choices = c('Please select a field to merge upon'), multiple = F)
+                           selectInput('targetField', "Target's timestamps", choices = c('Please select a field to merge upon'), multiple = F)
                            ),   
                     column(12,
-                           selectInput('predictorField', 'Predictor', choices = c('Please select a field to merge upon'), multiple = F)
+                           selectInput('predictorField', "Predictor's timestamps", choices = c('Please select a field to merge upon'), multiple = F)
                     )
                 ),
                 box(width = 4,

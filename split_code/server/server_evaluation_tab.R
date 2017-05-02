@@ -34,7 +34,7 @@ outputOptions(output, 'isClassification', suspendWhenHidden = FALSE)
 # regression
 observeEvent(input$goReg,{
   # build regression model
-  model <- lm(DData ~ ., data=v$features)
+  model <- lm(DData ~ ., data=v$features[,-1])
   v$model <- model
   print(summary.lm(v$model)) 
   PParameterReg <- v$PParameterReg
@@ -47,6 +47,7 @@ observeEvent(input$goReg,{
   v$predicted_target <- predict(model)
   # plot predicted vs real target with dygraphs
   output$targetTargetPlot <- renderDygraph({
+    # TODO: Date-time in plotting!
     varX <- seq(from = 1, to = nrow(v$features))
     target <- v$features[,"DData"]
     predicted_target = v$predicted_target
@@ -74,8 +75,8 @@ observeEvent(input$goReg,{
       save(model, PParameterReg, file = file)
     }
   )
-  # TODO:export data  plus timestamps
-  target <- v$features[,"DData"]
+
+  target <- v$features[,c(1,2)]
   predicted_target = v$predicted_target
   dataModelReg <- as.data.frame(cbind(target, predicted_target)) 
   output$exportModelData <- downloadHandler(
@@ -91,7 +92,7 @@ observeEvent(input$goReg,{
 # classification
 observeEvent(input$goClass,{
   # Train decision tree and record accuracy
-  model <- J48(DData ~ ., data=v$features)
+  model <- J48(DData ~ ., data=v$features[,-1])
   v$model <- model
   .jcache(model$classifier)
   print(summary(model, numFolds = 10, seed = 17))
@@ -127,8 +128,7 @@ observeEvent(input$goClass,{
     }
   )
   
-  # TODO:export data plus timestamps
-  target <- v$features[,"DData"]
+  target <- v$features[,c(1,2)]
   predicted_target = v$predicted_target
   dataModelClass <- as.data.frame(cbind(target, predicted_target)) 
   output$exportModelData <- downloadHandler(
@@ -378,6 +378,10 @@ output$modelDataSummary <- renderPrint({
 # Event of clicking on runModel button
 observeEvent(input$runModel,{
   # TODO: connect to recalculating algo
+  # TODO: connect to recalculating algo
+  # predict new labels
+  predict(v$model, newdata = v$modelData)
+  # print(summary(model, newdata = testDataset))
   # TODO: update the tabs with the new results
   
 })
