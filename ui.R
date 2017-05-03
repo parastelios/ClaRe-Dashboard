@@ -902,76 +902,76 @@ dashboardPage(
                       actionButton('runModel0', 'Run Model', class="goButton", icon = icon("sign-in")
                       )
                   )
-                )
-              ),
-              conditionalPanel(
-                'output.isRunModelClicked0',
-                fluidRow(
-                  tabBox(
-                    id = "newModelResults0",
-                    width = 12,
-                    tabPanel(
-                      "Model Summary", icon = icon("file-text-o"),
-                      fluidRow(
-                        # running image
-                        conditionalPanel(
-                          condition="$('html').hasClass('shiny-busy')",
-                          column(12, align = 'center',
-                                 tags$img(src="loading_circle.gif")
-                          )
-                        ),
-                        # model summary  
-                        box(
-                          width = 12,
-                          verbatimTextOutput("featuresStatisticsSummary0") 
-                        )
-                      )
-                    ),
-                    tabPanel(
-                      "Visualize Model", icon = icon("sitemap"), #("file-image-o"),
-                      fluidRow(
-                        # running image
-                        conditionalPanel(
-                          condition="$('html').hasClass('shiny-busy')",
-                          column(12, align = 'center',
-                                 tags$img(src="loading_circle.gif")
-                          )
-                        ),
-                        # visualization
-                        # regression
-                        conditionalPanel(
-                          "output.isRegression0",
-                          box(width = 12,
-                              title = 'Plot: Real target vs Predicted target',
-                              dygraphOutput("targetTargetPlot0")
+                ),
+                conditionalPanel(
+                  'output.isRunModelClicked0',
+                  fluidRow(
+                    tabBox(
+                      id = "newModelResults0",
+                      width = 12,
+                      tabPanel(
+                        "Model Summary", icon = icon("file-text-o"),
+                        fluidRow(
+                          # running image
+                          conditionalPanel(
+                            condition="$('html').hasClass('shiny-busy')",
+                            column(12, align = 'center',
+                                   tags$img(src="loading_circle.gif")
+                            )
                           ),
+                          # model summary  
                           box(
                             width = 12,
-                            verbatimTextOutput("modelSummary0") 
-                          )
-                        ),
-                        # classification
-                        conditionalPanel(
-                          "output.isClassification0",
-                          box(
-                            width = 12,
-                            title = "Decision Tree",
-                            plotOutput("decisionTree0")
+                            verbatimTextOutput("featuresStatisticsSummary0") 
                           )
                         )
-                      )
-                    ),
-                    tabPanel(
-                      tagList(shiny::icon("download"), "Export Model"),
-                      div(
-                        style="text-align:center; padding:30px",
-                        downloadButton("exportModel0",
-                                       label = "Export Model (.rda)")
                       ),
-                      div(
-                        style="text-align:center; padding:30px",
-                        downloadButton("exportModelData0",
-                                       label = "Export Model Dataset (.csv)")
+                      tabPanel(
+                        "Visualize Prediction", icon = icon("sitemap"), #("file-image-o"),
+                        fluidRow(
+                          # running image
+                          conditionalPanel(
+                            condition="$('html').hasClass('shiny-busy')",
+                            column(12, align = 'center',
+                                   tags$img(src="loading_circle.gif")
+                            )
+                          ),
+                          # visualization
+                          # regression
+                          conditionalPanel(
+                            "output.isRegression0",
+                            box(width = 12,
+                                title = 'Plot: Real target vs Predicted target',
+                                dygraphOutput("targetTargetPlot0")
+                            ),
+                            box(
+                              width = 12,
+                              verbatimTextOutput("modelSummary0") 
+                            )
+                          ),
+                          # classification
+                          conditionalPanel(
+                            "output.isClassification0",
+                            box(
+                              width = 12,
+                              title = "Decision Tree",
+                              plotOutput("decisionTree0")
+                            )
+                          )
+                        )
+                      ),
+                      tabPanel(
+                        tagList(shiny::icon("download"), "Exports"),
+                        div(
+                          style="text-align:center; padding:30px",
+                          downloadButton("exportModel0",
+                                         label = "Export Model (.rda)")
+                        ),
+                        div(
+                          style="text-align:center; padding:30px",
+                          downloadButton("exportModelData0",
+                                         label = "Export Model Dataset (.csv)")
+                        )
                       )
                     )
                   )
@@ -1002,7 +1002,7 @@ dashboardPage(
                 )
               ),
               tabPanel(
-                "Visualize Model", icon = icon("sitemap"), #("file-image-o"),
+                "Visualize Prediction", icon = icon("sitemap"), #("file-image-o"),
                 fluidRow(
                   # running image
                   conditionalPanel(
@@ -1036,7 +1036,8 @@ dashboardPage(
                 )
               ),
               tabPanel(
-                tagList(shiny::icon("download"), "Export Model"),
+                tagList(shiny::icon("download"), "Exports"),
+                # TODO: features dataset export, plot/tree export
                 div(
                   style="text-align:center; padding:30px",
                   downloadButton("exportModel",
@@ -1045,102 +1046,103 @@ dashboardPage(
                 div(
                   style="text-align:center; padding:30px",
                   downloadButton("exportModelData",
-                                 label = "Export Model Dataset (.csv)")
+                                 label = "Export Predicted Dataset (.csv)")
                 )
               ),
               tabPanel(
-                "Import Model", icon = icon("upload"),
+                "Evaluate new Dataset", icon = icon("retweet"),
                 fluidRow(
-                  # import model
-                  tabBox(
-                    id = "importModelTab",
-                    width = 6,
-                    tabPanel(
-                      "Load Model", icon = icon("upload"), #("file-image-o"),
-                      fluidRow(
-                        column(12, 
-                               checkboxInput('useCurrentModel', HTML('<b>Use current Model</b>'), FALSE)
-                        ),
-                        conditionalPanel(
-                          'output.currentModel',
-                          box(width = 12,
-                              #     fileInput("importModel", 
-                              #               "Choose Model File",
-                              #               accept = c(
-                              #                 "text/rds",
-                              #                 "text/rda",
-                              #                 "text/RData",
-                              #                 "text/plain",
-                              #                 ".rda",
-                              #                 ".RData",
-                              #                 ".rds"
-                              #               )
-                              #     )
-                              # ),
-                              # column(12, align = "center",
-                              #        actionButton('loadNewModel', 'Load Model', class="goButton", icon = icon("sign-in"))
-                              uiOutput("loadModel")
-                              )
-                          )
-                      )
-                    ),
-                    tabPanel(
-                      "Model Preview", icon = icon("file-text-o"),
-                      verbatimTextOutput("modelPreview")
-                    )
-                  ),
-                  
                   # import data
+                  box(width = 12, title = HTML('<i class="fa fa-upload" aria-hidden="true"></i>  Load New Dataset'),
+                      column(6,
+                             # fileInput('loadModelData', 'Choose CSV File',
+                             #           accept=c('text/csv', 
+                             #                    'text/comma-separated-values,text/plain', 
+                             #                    '.csv'))  
+                             uiOutput('loadModelData')
+                      ),
+                      column(2,
+                        radioButtons('modelSep', 'Separator',
+                                     c(Comma=',',
+                                       Semicolon=';',
+                                       Tab='\t'),
+                                     ',')  
+                      ),
+                      column(2,
+                             radioButtons('modelQuote', 'Quote',
+                                          c(None='',
+                                            'Double Quote'='"',
+                                            'Single Quote'="'"),
+                                          '"')
+                      ),
+                      column(2,
+                        checkboxInput('modelHeader', 'Header', TRUE)  
+                      )
+                  ),
+                  box(width = 12, title = HTML('<i class="fa fa-forward" aria-hidden="true"></i> Predict Target'),
+                      align = 'center',
+                      actionButton('runModel', 'Run Model', class="goButton", icon = icon("sign-in")
+                      )
+                  ),
+                  # allow x-flow for DT:dataTable
+                  shinyjs::inlineCSS(list(
+                    ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                  )),
                   tabBox(
                     id = "importDataModelTab",
-                    width = 6,
+                    width = 12,
                     tabPanel(
-                      "Load Data", icon = icon("upload"),
-                      fluidRow(
-                        box(
-                          width = 12,
-                          # fileInput('loadModelData', 'Choose CSV File',
-                          #           accept=c('text/csv', 
-                          #                    'text/comma-separated-values,text/plain', 
-                          #                    '.csv'))  
-                          uiOutput('loadModelData')
-                        ),
-                        column(4,
-                               checkboxInput('modelHeader', 'Header', TRUE)
-                        ),
-                        column(4,
-                               radioButtons('modelSep', 'Separator',
-                                            c(Comma=',',
-                                              Semicolon=';',
-                                              Tab='\t'),
-                                            ',')
-                        ),
-                        column(4,
-                               radioButtons('modelQuote', 'Quote',
-                                            c(None='',
-                                              'Double Quote'='"',
-                                              'Single Quote'="'"),
-                                            '"')
-                        )
-                      )
-                    ),
-                    # allow x-flow for DT:dataTable
-                    shinyjs::inlineCSS(list(
-                      ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-                    )),
-                    tabPanel(
-                      "Model Data", icon = icon("table"),
+                      "Data Preview", icon = icon("table"),
                       uiOutput("modelDataTable")
                     ),
                     tabPanel(
                       "Data Summary", icon = icon("file-text-o"),
                       verbatimTextOutput("modelDataSummary")
-                    )
-                  ),
-                  box(width = 12, align = 'center',
-                      actionButton('runModel', 'Run Model', class="goButton", icon = icon("sign-in")
+                    ),
+                    tabPanel(
+                      "Vizualize new Prediction", icon = icon("sitemap"), 
+                      fluidRow(
+                        conditionalPanel(
+                          'output.isRunModelNOTClicked',
+                          fluidRow(
+                            align = 'center',
+                            column(12, 
+                                   align = 'center',
+                                   bsAlert('clickRunModel')
+                            )
+                          )
+                        ),
+                        box(width = 12,
+                            title = 'Plot: Real target vs Predicted target',
+                            dygraphOutput("targetTargetPlotNew")
+                        ),
+                        box(
+                          width = 12,
+                          verbatimTextOutput("newModelSummary") 
+                        )
                       )
+                    ),
+                    tabPanel(
+                      "Export Predicted Data", icon = icon("download"), 
+                      fluidRow(
+                        conditionalPanel(
+                          'output.isRunModelNOTClicked1',
+                          fluidRow(
+                            align = 'center',
+                            column(12, 
+                                   align = 'center',
+                                   bsAlert('clickRunModel1')
+                            )
+                          )
+                        )
+                      )
+                    )
                   )
+                )
+              ),
+              tabPanel("Compare Models", icon = icon("upload"),
+                fluidRow(
+                      
                 )
               )
             )

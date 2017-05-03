@@ -72,15 +72,15 @@ observeEvent(input$goClass,{
   v$AIData <- analyseIndependentData(v$data[,-ncol(v$data)])
   v$AIData$Stable.Sampling.Rate <- "yes"
   # Update Accordion parameters according to the users preferences
-  v$PParameterClass <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateClass, input$maxWindowClass)
-  v$PParameterClass$nOperations <- input$numOfSamplesClass
-  v$PParameterClass$Size <- round(seq(from=v$PParameterClass$Jump, to=input$maxWindowClass, length.out=v$PParameterClass$nOperations), digits = 0)
+  v$PParameter <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateClass, input$maxWindowClass)
+  v$PParameter$nOperations <- input$numOfSamplesClass
+  v$PParameter$Size <- round(seq(from=v$PParameter$Jump, to=input$maxWindowClass, length.out=v$PParameter$nOperations), digits = 0)
   
   # Downsample the target
-  aTarIndex <- seq(from = v$PParameterClass$Jump, to = v$AIData$Variables.nrow, by = v$PParameterClass$Jump)
+  aTarIndex <- seq(from = v$PParameter$Jump, to = v$AIData$Variables.nrow, by = v$PParameter$Jump)
   
   # Run accordion
-  v$features <- embeddedGainRatioFS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterClass)
+  v$features <- embeddedGainRatioFS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameter)
   
   timestamp <- v$data[aTarIndex,1]
   v$features <- cbind(timestamp, v$features)

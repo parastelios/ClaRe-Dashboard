@@ -226,9 +226,8 @@ output$modelDataSummary0 <- renderPrint({
 observeEvent(input$runModel0, {
   runModelClicked0 = TRUE
   # TODO: connect to recalculating algo
-  # predict new labels
-  # predict(model, newdata = testDataset)  
-  # print(summary(model, newdata = testDataset))
+  
+  # TODO: given Accordion options
   
   # check for results tabs
   output$isRunModelClicked0 <- reactive({

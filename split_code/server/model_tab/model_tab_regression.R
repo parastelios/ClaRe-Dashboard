@@ -84,22 +84,22 @@ observeEvent(input$goReg,{
   v$AIData$Stable.Sampling.Rate <- "yes"
   
   # Update Accordion parameters according to the users preferences
-  v$PParameterReg <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateReg, input$maxWindowReg)
-  v$PParameterReg$nOperations <- input$numOfSamplesReg
-  v$PParameterReg$Size <- round(seq(from=v$PParameterReg$Jump, to=input$maxWindowReg, length.out=v$PParameterReg$nOperations), digits = 0)
+  v$PParameter <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateReg, input$maxWindowReg)
+  v$PParameter$nOperations <- input$numOfSamplesReg
+  v$PParameter$Size <- round(seq(from=v$PParameter$Jump, to=input$maxWindowReg, length.out=v$PParameter$nOperations), digits = 0)
   
   # Downsample the target
-  aTarIndex <- seq(from = v$PParameterReg$Jump, to = v$AIData$Variables.nrow, by = v$PParameterReg$Jump)
+  aTarIndex <- seq(from = v$PParameter$Jump, to = v$AIData$Variables.nrow, by = v$PParameter$Jump)
   aTarIndex[length(aTarIndex)]
   
   # Run accordion for lag regression
   if(input$regressionMethod == 'linearReg'){
     print('linear')
-    v$features <- embedded.Cor.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg)
+    v$features <- embedded.Cor.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameter)
   }
   else{
     print('lag')
-    v$features <- embedded.CCF.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameterReg) 
+    v$features <- embedded.CCF.FS(v$data[aTarIndex,ncol(v$data)], v$data[1:aTarIndex[length(aTarIndex)],-ncol(v$data)], v$AIData, v$PParameter) 
   }
   timestamp <- v$data[aTarIndex,1]
   v$features <- cbind(timestamp, v$features)

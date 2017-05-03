@@ -37,7 +37,7 @@ observeEvent(input$goReg,{
   model <- lm(DData ~ ., data=v$features[,-1])
   v$model <- model
   print(summary.lm(v$model)) 
-  PParameterReg <- v$PParameterReg
+  PParameter <- v$PParameter
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
       return()
@@ -64,7 +64,7 @@ observeEvent(input$goReg,{
   # export model
   print(v$model)
   if (SAVE_MODEL == T) {
-    save(model, PParameterReg, file = 'model.rda')
+    save(model, PParameter, file = 'model.rda')
   }
   
   output$exportModel <- downloadHandler(
@@ -72,7 +72,7 @@ observeEvent(input$goReg,{
       paste('RegressiontionModel-', Sys.time(), '.rda', sep='')
     },
     content = function(file) {
-      save(model, PParameterReg, file = file)
+      save(model, PParameter, file = file)
     }
   )
 
@@ -96,7 +96,7 @@ observeEvent(input$goClass,{
   v$model <- model
   .jcache(model$classifier)
   print(summary(model, numFolds = 10, seed = 17))
-  PParameterClass <- v$PParameterClass
+  PParameter <- v$PParameter
   # print(model)
   output$featuresStatisticsSummary <- renderPrint({
     if (is.null(data))
@@ -116,7 +116,7 @@ observeEvent(input$goClass,{
   
   #save model in workspace and 
   if (SAVE_MODEL == T) {
-    save(model, PParameterClass, file = 'model.rda')
+    save(model, PParameter, file = 'model.rda')
   } 
   
   output$exportModel <- downloadHandler(
@@ -124,7 +124,7 @@ observeEvent(input$goClass,{
       paste('ClassificationModel-', Sys.time(), '.rda', sep='')
     },
     content = function(file) {
-      save(model, PParameterClass, file = file)
+      save(model, PParameter, file = file)
     }
   )
   
@@ -265,7 +265,7 @@ updatemodelDataInput <- function (name = NULL){
     result <- tagAppendChild(
       result,
       fileInput(paste0('modelDataFile', index), 
-                'Choose Data File (.csv)',
+                'Choose File (.csv)',
                 accept=c('text/csv','text/comma-separated-values,text/plain','.csv'))
     )
     
@@ -375,13 +375,91 @@ output$modelDataSummary <- renderPrint({
 })
 
 # Run loaded model
+# check if RunModel is pressed for new prediction tab
+v$runModelNOTClicked = TRUE
+output$isRunModelNOTClicked <- reactive({
+  isRunModelNOTClicked = v$runModelNOTClicked
+  return(isRunModelNOTClicked)
+})
+outputOptions(output, 'isRunModelNOTClicked', suspendWhenHidden = FALSE)
+# info modal
+createAlert(session, 'clickRunModel', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> For more options:', 
+            content = HTML('<p><b>Load a new dataset and press "Run Model" above </b>'),
+            append = F
+            # style = 'warning'
+)
+# check if RunModel is pressed for new Export Predicted Data tab
+output$isRunModelNOTClicked1 <- reactive({
+  isRunModelNOTClicked1 = v$runModelNOTClicked
+  return(isRunModelNOTClicked1)
+})
+outputOptions(output, 'isRunModelNOTClicked1', suspendWhenHidden = FALSE)
+
+# info modal
+createAlert(session, 'clickRunModel1', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> For more options:', 
+            content = HTML('<p><b>Load a new dataset and press "Run Model" above </b>'),
+            append = F
+            # style = 'warning'
+)
+
 # Event of clicking on runModel button
 observeEvent(input$runModel,{
-  # TODO: connect to recalculating algo
-  # TODO: connect to recalculating algo
-  # predict new labels
-  predict(v$model, newdata = v$modelData)
-  # print(summary(model, newdata = testDataset))
-  # TODO: update the tabs with the new results
+  v$runModelNOTClicked = FALSE
+  
+  # the new dataset
+  newDataSet <- v$modelData
+  # TODO: check if it has the same columns or colNames with the one of the model
+  # predictors
+  IData <- newDataSet[,-ncol(newDataSet)]
+  # TODO: choose target column
+
+  # Analyse predictors
+  AIData <- analyseIndependentData(IData)
+
+  # Update Accordion parameters according to the users preferences
+  PParameter <- v$PParameter
+  
+  # Downsample
+  aTarIndex <- seq(from = PParameter$Jump, to = v$AIData$Variables.nrow, by = v$PParameter$Jump)
+  aTarIndex[length(aTarIndex)]
+  
+  # make sure that target and predictors are multiple of each other
+  IData <- IData[1:aTarIndex[length(aTarIndex)],]
+  DData <- IData[aTarIndex,ncol(IData)]
+
+  # build the evaluation dataset
+  v$evalData <- data.frame(cbind(time,DData))
+  for(k in 3:ncol(v$features)) {
+  # start from col 3, because features start at this col, before them there are timestamp and DData cols
+    print(k)
+    FSName <- colnames(v$features)[k]
+    FSTuple <- unlist(strsplit(FSName,split="_"))
+    node <- eval(parse(text = paste(FSTuple[2],"(IData$",FSTuple[1],",AIData$Variables.nrow,PParameter$Jump,",FSTuple[3],")",sep="")))
+    print(paste(FSTuple[2],"(IData$",FSTuple[1],",AIData$Variables.nrow,PParameter$Jump,",FSTuple[3],")",sep=""))
+    v$evalData <- cbind(v$evalData, node)
+    colnames(v$evalData)[k] <- FSName
+  }
+  
+  # predict new values
+  print(summary(v$model, newdata = v$evalData[,-1]))
+  v$predictedNewTarget <- predict(v$model, newdata = v$evalData[,-1])  
+  # plot predicted vs real target with dygraphs
+  output$targetTargetPlotNew <- renderDygraph({
+    # TODO: Date-time in plotting!
+    varX <- seq(from = 1, to = nrow(v$evalData))
+    target <- v$evalData[,"DData"]
+    predictedNewTarget = v$predictedNewTarget
+    varY <- as.data.frame(cbind(target, predictedNewTarget))
+    g <- dygraph(cbind(varX, varY))%>%
+      dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
+  })
+  output$newModelSummary <- renderPrint({
+    target <- v$evalData[,"DData"]
+    predictedNewTarget = v$predictedNewTarget
+    summary(as.data.frame(cbind(target, predictedNewTarget)))
+  })
   
 })
+

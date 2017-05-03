@@ -48,7 +48,7 @@ observeEvent(input$confirmMerging,{
   updateNumericInput(session, "maxWindowReg",
                     value = v$maxWinReg,
                     min = 0, max = 10*(v$maxWinReg), step = 1)
-  v$PParameterReg <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateReg, input$maxWindowReg)
+  # v$PParameter <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateReg, input$maxWindowReg)
   
   # update the classification options after merge
   updateNumericInput(session, "tarSampleRateClass", 
@@ -61,5 +61,5 @@ observeEvent(input$confirmMerging,{
                     min = 0, max = 10*v$maxWinClass, step = 1)
   
   # calculate the parameters that go into Accordion
-  v$PParameterClass <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateClass, input$maxWindowClass)
+  # v$PParameter <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateClass, input$maxWindowClass)
 })
