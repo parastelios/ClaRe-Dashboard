@@ -417,27 +417,29 @@ observeEvent(input$runModel,{
 
   # Analyse predictors
   AIData <- analyseIndependentData(IData)
-
+  
   # Update Accordion parameters according to the users preferences
   PParameter <- v$PParameter
-  
+
   # Downsample
-  aTarIndex <- seq(from = PParameter$Jump, to = v$AIData$Variables.nrow, by = v$PParameter$Jump)
-  aTarIndex[length(aTarIndex)]
+  aTarIndex <- seq(from = PParameter$Jump, to = AIData$Variables.nrow, by = PParameter$Jump)
   
   # make sure that target and predictors are multiple of each other
   IData <- IData[1:aTarIndex[length(aTarIndex)],]
-  DData <- IData[aTarIndex,ncol(IData)]
+  DData <- newDataSet[aTarIndex,ncol(newDataSet)]
 
   # build the evaluation dataset
   v$evalData <- data.frame(cbind(time,DData))
+  print(nrow(v$evalData))
   for(k in 3:ncol(v$features)) {
   # start from col 3, because features start at this col, before them there are timestamp and DData cols
-    print(k)
+    #print(k)
     FSName <- colnames(v$features)[k]
     FSTuple <- unlist(strsplit(FSName,split="_"))
     node <- eval(parse(text = paste(FSTuple[2],"(IData$",FSTuple[1],",AIData$Variables.nrow,PParameter$Jump,",FSTuple[3],")",sep="")))
     print(paste(FSTuple[2],"(IData$",FSTuple[1],",AIData$Variables.nrow,PParameter$Jump,",FSTuple[3],")",sep=""))
+    print(length(node))
+    # v$evalData[[k]] <- node
     v$evalData <- cbind(v$evalData, node)
     colnames(v$evalData)[k] <- FSName
   }
