@@ -824,6 +824,13 @@ dashboardPage(
               tabPanel(
                 "Create Model", icon = icon("info"),
                 fluidRow(
+                  # running image
+                  conditionalPanel(
+                    condition="$('html').hasClass('shiny-busy')",
+                    column(12, align = 'center',
+                           tags$img(src="loading_circle.gif")
+                    )
+                  ),
                   align = 'center',
                   column(12, 
                     align = 'center',
@@ -834,6 +841,13 @@ dashboardPage(
               tabPanel(
                 "Import Model", icon = icon("upload"),
                 fluidRow(
+                  # running image
+                  conditionalPanel(
+                    condition="$('html').hasClass('shiny-busy')",
+                    column(12, align = 'center',
+                           tags$img(src="loading_circle.gif")
+                    )
+                  ),
                   # import model
                   tabBox(
                     id = "importModelTab0",
@@ -1112,13 +1126,16 @@ dashboardPage(
                             )
                           )
                         ),
-                        box(width = 12,
-                            title = 'Plot: Real target vs Predicted target',
-                            dygraphOutput("targetTargetPlotNew")
-                        ),
-                        box(
-                          width = 12,
-                          verbatimTextOutput("newModelSummary") 
+                        conditionalPanel(
+                          'output.isRunModelClicked',
+                          box(width = 12,
+                              title = 'Plot: Real target vs Predicted target',
+                              dygraphOutput("targetTargetPlotNew")
+                          ),
+                          box(
+                            width = 12,
+                            verbatimTextOutput("newModelSummary") 
+                          )
                         )
                       )
                     ),

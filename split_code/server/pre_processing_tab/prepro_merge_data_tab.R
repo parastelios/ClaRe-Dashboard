@@ -7,7 +7,9 @@ observeEvent(input$confirmMerging, {
   predField = input$predictorField
   tarField = input$targetField
   tarOption = input$targetOption
-  v$data = mergeData(v$data_pre, v$data_tar, predField, tarField, tarOption, input$excludingPre)
+  v$selectedTarget = tarOption
+  v$mergedData = mergeData(v$data_pre, v$data_tar, predField, tarField, tarOption, input$excludingPre)
+  v$data = v$mergedData
   v$d_colNA = getColWithNAEntries(v$data)
   renderMergedDataTable(v$data) 
   removeModal()
