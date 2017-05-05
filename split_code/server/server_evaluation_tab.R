@@ -18,18 +18,23 @@ outputOptions(output, 'featuresNonEmpty', suspendWhenHidden = FALSE)
 
 # checking if regression
 output$isRegression <- reactive({
-  isRegression = is.numeric(v$features[,2])
+  isRegression = is.numeric(v$features[1,2])
   return(isRegression)
 })
 outputOptions(output, 'isRegression', suspendWhenHidden = FALSE)
 
 # checking if classification
-output$isClassification <- reactive({
-  isClassification = !is.numeric(v$features[1,2])
-  return(isClassification)
+output$isClassification1 <- reactive({
+  isClassification1 = !is.numeric(v$features[1,2])
+  return(isClassification1)
 })
-outputOptions(output, 'isClassification', suspendWhenHidden = FALSE)
+outputOptions(output, 'isClassification1', suspendWhenHidden = FALSE)
 
+output$isClassification2 <- reactive({
+  isClassification2 = !is.numeric(v$features[1,2])
+  return(isClassification2)
+})
+outputOptions(output, 'isClassification2', suspendWhenHidden = FALSE)
 
 # regression
 observeEvent(input$goReg,{
@@ -90,7 +95,7 @@ observeEvent(input$goReg,{
     g <- dygraph(cbind(varX, varY))%>%
       dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
   })
-  output$modelSummary <- renderPrint({
+  output$modelSummary1 <- renderPrint({
     summary(as.data.frame(predTable[,c(2,3)]))
   })
   
@@ -137,6 +142,7 @@ observeEvent(input$goClass,{
     else
       summary(model, numFolds = 10, seed = 17)
   })
+  v$predictedTarget <- predict(model)
   
   # table with time, target and predicted target
   predTable <- cbind(v$features[,c(1,2)], v$predictedTarget)
@@ -177,6 +183,17 @@ observeEvent(input$goClass,{
   # TODO: make it look nicer
   output$decisionTree <- renderPlot({
     plot(model)
+  })
+  output$modelSummary2 <- renderPrint({
+    summary(as.data.frame(predTable[,c(2,3)]))
+  })
+  
+  output$targetTargetPlot2 <- renderDygraph({
+    # TODO: Date-time in plotting!
+    varX <- seq(from = 1, to = nrow(predTable))
+    varY <- as.data.frame(predTable[,c(2,3)])
+    g <- dygraph(cbind(varX, varY))%>%
+      dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
   })
   
   # export model
@@ -490,7 +507,7 @@ observeEvent(input$runModel,{
   # predictors
   IData <- v$modelData[,-ncol(v$modelData)]
   # TODO: choose target column
-
+  
   # Analyse predictors
   AIData <- analyseIndependentData(IData)
   
@@ -503,10 +520,13 @@ observeEvent(input$runModel,{
   # make sure that target and predictors are multiple of each other
   IData <- IData[1:aTarIndex[length(aTarIndex)],]
   target <- v$modelData[aTarIndex,ncol(v$modelData)]
-
+  if(is.factor(target)){
+    target = as.character(target)
+  }
+  
   # build the evaluation dataset
-  v$evalData <- data.frame(cbind(v$features[,1],target))
-  print(v$evalData)
+  v$evalData <- data.frame(cbind(v$features[,1],target), stringsAsFactors = TRUE)
+  
   for(k in 3:ncol(v$features)) {
   # start from col 3, because features start at this col, before them there are timestamp and DData cols
     FSName <- colnames(v$features)[k]
@@ -522,11 +542,18 @@ observeEvent(input$runModel,{
   v$predictedNewTarget <- predict(v$model, newdata = v$evalData[,-1])  
   
   # table with time, target and predicted target
-  predTable <- cbind(v$evalData[,c(1,2)], v$predictedTarget)
+  predTable <- data.frame(cbind(v$evalData[,c(1,2)], v$predictedTarget))
   colnames(predTable)[2] <- v$selectedTarget
   colnames(predTable)[3] <- paste0('predicted_', v$selectedTarget)
-  
+
   # mergedData with predicted target
+  
+  # check if regression
+  output$isNewTargetNumeric <- reactive({
+    isNewTargetNumeric = is.numeric(v$modelData[,ncol(v$modelData)])
+    return(isNewTargetNumeric)
+  })
+  outputOptions(output, 'isNewTargetNumeric', suspendWhenHidden = FALSE)
   
   # plot predicted vs real target with dygraphs
   output$targetTargetPlotNew <- renderDygraph({
@@ -536,9 +563,27 @@ observeEvent(input$runModel,{
     g <- dygraph(cbind(varX, varY))%>%
       dyLegend(show = "onmouseover", showZeroValues = TRUE, hideOnMouseOut = FALSE)
   })
-  output$newModelSummary <- renderPrint({
+  output$newModelSummary1 <- renderPrint({
     summary(as.data.frame(predTable[,c(2,3)]))
   })
+  
+  # check if classification
+  output$isNewTargetFactor <- reactive({
+    isNewTargetFactor = is.factor(v$modelData[,ncol(v$modelData)])
+    return(isNewTargetFactor)
+  })
+  outputOptions(output, 'isNewTargetFactor', suspendWhenHidden = FALSE)
+  
+  # plot decision tree
+  # TODO: make it look nicer
+  output$newDecisionTree <- renderPlot({
+    plot(v$model)
+  })
+  output$newModelSummary2 <- renderPrint({
+    summary(as.data.frame(predTable[,c(2,3)]))
+  })
+  
+
   
 })
 

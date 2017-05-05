@@ -1012,6 +1012,14 @@ dashboardPage(
                   box(
                     width = 12,
                     verbatimTextOutput("featuresStatisticsSummary") 
+                  ),
+                  conditionalPanel(
+                    "output.isClassification1",
+                    box(
+                      width = 12,
+                      title = "Decision Tree",
+                      plotOutput("decisionTree")
+                    )
                   )
                 )
               ),
@@ -1035,16 +1043,19 @@ dashboardPage(
                     ),
                     box(
                       width = 12,
-                      verbatimTextOutput("modelSummary") 
+                      verbatimTextOutput("modelSummary1") 
                     )
                   ),
                   # classification
                   conditionalPanel(
-                    "output.isClassification",
+                    "output.isClassification2",
+                    box(width = 12,
+                        title = 'Plot: Real target vs Predicted target',
+                        dygraphOutput("targetTargetPlot2")
+                    ),
                     box(
                       width = 12,
-                      title = "Decision Tree",
-                      plotOutput("decisionTree")
+                      verbatimTextOutput("modelSummary2") 
                     )
                   )
                 )
@@ -1128,13 +1139,28 @@ dashboardPage(
                         ),
                         conditionalPanel(
                           'output.isRunModelClicked',
-                          box(width = 12,
-                              title = 'Plot: Real target vs Predicted target',
-                              dygraphOutput("targetTargetPlotNew")
+                          conditionalPanel(
+                            'output.isNewTargetNumeric',
+                            box(width = 12,
+                                title = 'Plot: Real target vs Predicted target',
+                                dygraphOutput("targetTargetPlotNew")
+                            ),
+                            box(
+                              width = 12,
+                              verbatimTextOutput("newModelSummary1") 
+                            )  
                           ),
-                          box(
-                            width = 12,
-                            verbatimTextOutput("newModelSummary") 
+                          conditionalPanel(
+                            'output.isNewTargetFactor',
+                            box(
+                              width = 12,
+                              title = "Decision Tree",
+                              plotOutput("newDecisionTree")
+                            ),
+                            box(
+                              width = 12,
+                              verbatimTextOutput("newModelSummary2") 
+                            )
                           )
                         )
                       )
