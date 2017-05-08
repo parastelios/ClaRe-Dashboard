@@ -60,100 +60,149 @@ dashboardPage(
       tabItem(
         tabName = "import",
         fluidRow(
-          box(
-            width = 6,
-            title = "Upload Predictors Data",
-            fluidRow(
-              box(
-                width = 4,
-                radioButtons('sepPre', 'Separator',
-                             c(Comma=',',
-                               Semicolon=';',
-                               Tab='\t'),
-                             ',')
-              ),
-              box(
-                width = 4,
-                radioButtons('quotePre', 'Quote',
-                             c(None='',
-                               'Double Quote'='"',
-                               'Single Quote'="'"),
-                             '"')
-              ),
-              box(
-                width = 4,
-                checkboxInput('headerPre', 'Header', TRUE)
-                
-              )
-            ),
-            fluidRow(
-              box(
-                width = 12,
-                uiOutput('predictorImport')
-                # fileInput('file1', 'Choose CSV File',
-                #           accept=c('text/csv',
-                #                    'text/comma-separated-values,text/plain',
-                #                    '.csv'))
-                
-              ),
-              
-              # allow x-flow for DT:dataTable
-              shinyjs::inlineCSS(list(
-                ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-              )),
-              tabBox(
-                width = 12,
-                tabPanel("Predictors Data", uiOutput("predictorTable")),
-                tabPanel("Predictors Summary", verbatimTextOutput("predictorSummary"))
-              )
-            )
+          box(width = 12,
+              bsAlert("importInfo")
           ),
-          box(
-            width = 6,
-            title = "Upload Target Data",
-            fluidRow(
-              box(
-                width = 4,
-                radioButtons('sepTar', 'Separator',
-                             c(Comma=',',
-                               Semicolon=';',
-                               Tab='\t'),
-                             ',')
-              ),
-              box(
-                width = 4,
-                radioButtons('quoteTar', 'Quote',
-                             c(None='',
-                               'Double Quote'='"',
-                               'Single Quote'="'"),
-                             '"')
-              ),
-              box(
-                width = 4,
-                checkboxInput('headerTar', 'Header', TRUE)
-                
-              )
+          tabBox(
+            width = 12,
+            # single dataset
+            tabPanel("Single File", 
+                     fluidRow(
+                       box(width = 12, title = "Upload Data",
+                           column(6,
+                                  uiOutput('dataImport')
+                           ),
+                           
+                           column(2,
+                                  radioButtons('sepData', 'Separator',
+                                               c(Comma=',',
+                                                 Semicolon=';',
+                                                 Tab='\t'),
+                                               ',')
+                           ),
+                           column(2,
+                                  radioButtons('quoteData', 'Quote',
+                                               c(None='',
+                                                 'Double Quote'='"',
+                                                 'Single Quote'="'"),
+                                               '"')
+                           ),
+                           column(2,
+                                  checkboxInput('headerData', 'Header', TRUE)
+                           )
+                       ),
+                       # allow x-flow for DT:dataTable
+                       shinyjs::inlineCSS(list(
+                         ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                       )),
+                       tabBox(
+                         width = 12,
+                         tabPanel("Data Preview", uiOutput("datasetTable")),
+                         tabPanel("Data Summary", verbatimTextOutput("datasetSummary"))
+                       )
+                     )
             ),
-            
-            fluidRow(
-              box(
-                width = 12,
-                uiOutput('targetImport')
-                # fileInput('file1', 'Choose CSV File',
-                #           accept=c('text/csv',
-                #                    'text/comma-separated-values,text/plain',
-                #                    '.csv'))
-              ) 
-            ),
-            
-            # allow x-flow for DT:dataTable
-            shinyjs::inlineCSS(list(
-              ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-            )),
-            tabBox(
-              width = 12,
-              tabPanel("Targets Data", uiOutput("targetTable")),
-              tabPanel("Targets Summary", verbatimTextOutput("targetSummary"))
+            # two datasets
+            tabPanel("Two Files",
+                     fluidRow(
+                       # predictor import
+                       box(
+                         width = 6,
+                         title = "Upload Predictors Data",
+                         fluidRow(
+                           box(
+                             width = 4,
+                             radioButtons('sepPre', 'Separator',
+                                          c(Comma=',',
+                                            Semicolon=';',
+                                            Tab='\t'),
+                                          ',')
+                           ),
+                           box(
+                             width = 4,
+                             radioButtons('quotePre', 'Quote',
+                                          c(None='',
+                                            'Double Quote'='"',
+                                            'Single Quote'="'"),
+                                          '"')
+                           ),
+                           box(
+                             width = 4,
+                             checkboxInput('headerPre', 'Header', TRUE)
+                             
+                           )
+                         ),
+                         fluidRow(
+                           box(
+                             width = 12,
+                             uiOutput('predictorImport')
+                             # fileInput('file1', 'Choose CSV File',
+                             #           accept=c('text/csv',
+                             #                    'text/comma-separated-values,text/plain',
+                             #                    '.csv'))
+                             
+                           ),
+                           
+                           # allow x-flow for DT:dataTable
+                           shinyjs::inlineCSS(list(
+                             ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                           )),
+                           tabBox(
+                             width = 12,
+                             tabPanel("Predictors Data", uiOutput("predictorTable")),
+                             tabPanel("Predictors Summary", verbatimTextOutput("predictorSummary"))
+                           )
+                         )
+                       ),
+                       box(
+                         width = 6,
+                         title = "Upload Target Data",
+                         fluidRow(
+                           box(
+                             width = 4,
+                             radioButtons('sepTar', 'Separator',
+                                          c(Comma=',',
+                                            Semicolon=';',
+                                            Tab='\t'),
+                                          ',')
+                           ),
+                           box(
+                             width = 4,
+                             radioButtons('quoteTar', 'Quote',
+                                          c(None='',
+                                            'Double Quote'='"',
+                                            'Single Quote'="'"),
+                                          '"')
+                           ),
+                           box(
+                             width = 4,
+                             checkboxInput('headerTar', 'Header', TRUE)
+                             
+                           )
+                         ),
+                         # target import
+                         fluidRow(
+                           box(
+                             width = 12,
+                             uiOutput('targetImport')
+                             # fileInput('file1', 'Choose CSV File',
+                             #           accept=c('text/csv',
+                             #                    'text/comma-separated-values,text/plain',
+                             #                    '.csv'))
+                           ) 
+                         ),
+                         
+                         # allow x-flow for DT:dataTable
+                         shinyjs::inlineCSS(list(
+                           ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+                         )),
+                         tabBox(
+                           width = 12,
+                           tabPanel("Targets Data", uiOutput("targetTable")),
+                           tabPanel("Targets Summary", verbatimTextOutput("targetSummary"))
+                         )
+                       )
+                     )         
             )
           )
         )
@@ -167,245 +216,441 @@ dashboardPage(
       tabItem(
         tabName = 'preProcessing',
         fluidRow(
-          # tabs for pre-processing
-          tabBox( 
-            id = "preProTabs",
-            width = 12,
-#             tabPanel(
-#               "Date/Time parser", icon = icon("clock-o"),
-#               # date time buttons
-#               fluidRow(
-#                 # allow x-flow for DT:dataTable
-#                 shinyjs::inlineCSS(list(
-#                   ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
-#                 )),
-#                 align = 'center',
-#                 box(
-#                   width = 6,
-#                   title = "Predictor's Timestamp", 
-#                   column(4,
-#                       selectInput('preTimeCol', 
-#                                   'Chose Column with timestamp:', 
-#                                   choices = c('column'), 
-#                                   multiple = F
-#                       )
-#                   ),
-#                   column(8,
-#                          uiOutput("predictor1Table")
-#                          ),
-#                   column(12,
-#                          align = 'left',
-#                          h5(strong('Timestamp Preview: ')),
-#                          box(
-#                            width = 12,
-#                            align = 'center',
-#                            h4(uiOutput('preTimestamp'))
-#                          )
-#                   ),
-#                   column(6,
-#                         h5('If integer convert to Timestamp'),
-#                         actionButton('preTimeConvert','Convert')
-#                   )
-#                 ),
-#                 box(
-#                   width = 6,
-#                   title = "Target's Timestamp", 
-#                   column(4,
-#                          selectInput('tarTimeCol', 
-#                                      'Chose Column with timestamp:', 
-#                                      choices = c('column'), 
-#                                      multiple = F
-#                          )
-#                   ),
-#                   column(8,
-#                          uiOutput("target1Table")
-#                         ),
-#                   column(12,
-#                          align = 'left',
-#                          h5(strong('Timestamp Preview: ')),
-#                          box(
-#                            width = 12,
-#                            align = 'center',
-#                            h4(uiOutput('tarTimestamp'))
-#                          )
-#                   ),
-#                   column(6,
-#                          h5('If integer convert to Timestamp'),
-#                          actionButton('preTimeConvert','Convert')
-#                   )
-#                 )
-#               )
-#             ),
-            tabPanel(
-              "Merge", icon = icon("compress"),
-              fluidRow(
-                # merge data
-                box(width = 4, 
-                    title = '1. Select Merge Fields:',
-                    column(12,
-                           selectInput('targetField', "Target's timestamps", choices = c('Please select a field to merge upon'), multiple = F)
-                           ),   
-                    column(12,
-                           selectInput('predictorField', "Predictor's timestamps", choices = c('Please select a field to merge upon'), multiple = F)
-                    )
-                ),
-                box(width = 4,
-                    title = '2. Choices:',
-                    column(12,
-                           selectInput('targetOption', 'Choose your Target variable:', choices = c('Please select Target'))
-                           ),
-                    column(12,
-                           selectInput('excludingPre', 'Exclude Predictor variable(s)', choices = c('Select variable(s)'), multiple = T)
-                          )
-                ),
-                box(width = 4, 
-                    title = '3. Create merged Dataset:',
-                    actionButton('merge', 'Merge', class="goButton", icon = icon("arrow-circle-right"))
-                    # bsModal("popMerge", "Merging Choices", "merge", size = "large", uiOutput("uiMerging"))
-                       )
-              )
-            ),
-            tabPanel(
-              "Manage missing values", icon = icon("indent"),
-              fluidRow(
-                # interopolating/reapeting
-                box(width = 12, 
-                    conditionalPanel(
-                      'output.targetIsNull',
-                      bsAlert("noMerged")
-                    ),
-                    conditionalPanel(
-                      'output.targetWithNoNAvalues',
-                      bsAlert("noNAs")
-                    ),
-                    conditionalPanel(
-                      "output.isTargetNumeric",
-                      column(12,
-                             column(4,
-                                    selectizeInput(
-                                      'theNApolicy', 
-                                      "Select NA's Policy (numerical Target)",
-                                      choices = c('Interpolation', 'Repeating'),
-                                      multiple = F
-                                    )
-                             ),
-                             conditionalPanel(
-                               'input.theNApolicy == "Interpolation"',
+          conditionalPanel(
+            # if single file is imported
+            'output.noFileCheck',
+            box(width = 12,
+              bsAlert("noDataInfo")
+            )
+          ),
+          conditionalPanel(
+            # if single and seperated files are imported
+            'output.allFilesCheck',
+            box(width = 12, 
+                title = "Error with Data Import", icon = icon("exclamation-triangle"),
+                bsAlert("allDataInfo")
+            )
+          ),
+          conditionalPanel(
+            # if single file is imported
+            'output.oneFileCheck',
+            # tabs for pre-processing
+            tabBox( 
+              id = "preProTabs0",
+              width = 12,
+              tabPanel(
+                "Select Target", icon = icon("dot-circle-o"),
+                fluidRow(
+                  # select target
+                  box(width = 4,
+                      title = "1. Select Target",
+                      selectInput('targetOption0', 'Choose your Target variable:', choices = c('Please select Target'))
+                      ),
+                  box(width = 4,
+                      title = "2. Exlude Variables",
+                      selectInput('excluding', 'Choose variables to be excluded:', choices = c('Select variable(s)'), multiple = T)
+                      ),
+                  box(width = 4, 
+                      title = '3. Apply changes:',
+                      align = 'center',
+                      actionButton('apply', 'Apply', class="goButton", icon = icon("arrow-circle-right"))
+                      # bsModal("popMerge", "Merging Choices", "merge", size = "large", uiOutput("uiMerging"))
+                  )
+                )
+              ),
+              tabPanel(
+                "Manage mising Values", icon = icon("indent"),
+                fluidRow(
+                  # interopolating/reapeting
+                  box(width = 12, 
+                      conditionalPanel(
+                        'output.targetIsNull0',
+                        bsAlert("noTarget")
+                      ),
+                      conditionalPanel(
+                        'output.targetWithNoNAvalues0',
+                        bsAlert("noNAs0")
+                      ),
+                      conditionalPanel(
+                        "output.isTargetNumeric0",
+                        column(12,
                                column(4,
-                                      radioButtons('interpolationMethod', 'Select an interpolation Method',
-                                                   c(Linear ='linear',
-                                                     Spline = 'spline',
-                                                     Stineman = 'stine' ),                                                  
-                                                   selected = 'linear',
-                                                   inline = F)
-                                      ),
-                                column(12,
-                                      offset = 10,
-                                      actionButton('interpolate',
-                                                   'Interpolate')
-                                )
-                             ),
-                             conditionalPanel(
-                               'input.theNApolicy == "Repeating"',
-                               column(12, offset = 10,
-                                      actionButton('repeating1', 'Repeat')
+                                      selectizeInput(
+                                        'theNApolicy0', 
+                                        "Select NA's Policy (numerical Target)",
+                                        choices = c('Interpolation', 'Repeating'),
+                                        multiple = F
+                                      )
+                               ),
+                               conditionalPanel(
+                                 'input.theNApolicy0 == "Interpolation"',
+                                 column(4,
+                                        radioButtons('interpolationMethod0', 'Select an interpolation Method',
+                                                     c(Linear ='linear',
+                                                       Spline = 'spline',
+                                                       Stineman = 'stine' ),                                                  
+                                                     selected = 'linear',
+                                                     inline = F)
+                                 ),
+                                 column(12,
+                                        offset = 10,
+                                        actionButton('interpolate0',
+                                                     'Interpolate')
+                                 )
+                               ),
+                               conditionalPanel(
+                                 'input.theNApolicy0 == "Repeating"',
+                                 column(12, offset = 10,
+                                        actionButton('repeating01', 'Repeat')
+                                 )
                                )
-                              )
-                             )
-                       ),
-                    conditionalPanel(
-                      "output.isTargetNonNumeric",
-                      column(12, 
-                             align = 'center',
-                             bsAlert('targetIsNonNumeric'),
-                             actionButton('repeating2', 'Repeat')
+                        )
+                      ),
+                      conditionalPanel(
+                        "output.isTargetNonNumeric0",
+                        column(12, 
+                               align = 'center',
+                               bsAlert('targetIsNonNumeric0'),
+                               actionButton('repeating02', 'Repeat')
+                        )
+                      )
+                  )
+                )
+              ),
+              tabPanel(
+                "Other Options", icon = icon("tasks"),
+                fluidRow(
+                  # others like normalizing etc.
+                  shinyjs::inlineCSS(list(
+                    "#shiny-tab-preprocessing .goButton" = "position: absolute; right:10px; bottom: 20px"
+                  )),
+                  box(
+                    # status = "warning",
+                    width = 4,
+                    height = "200px",
+                    title = "Excludes",
+                    selectInput('excludingVar0', 'Exclude variable(s)', choices = c('Please Merge for options'), multiple = T),
+                    column(12, align = 'right',
+                           actionButton('goExcludingVar0', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                           bsModal("popExcludingVar0", "Excludes", "goExcludingVar0", size = "small", uiOutput("uiExcludingVar0"))
+                    )
+                  ),
+                  box(
+                    width = 4,
+                    height = "200px",
+                    title = "Outlier Removal",
+                    selectInput('outlierRemoval0', 'Select a variable', choices = c('Please Merge for options'), multiple = F),
+                    column(12, align ='right',
+                           actionButton('goOutlierRemoval0', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                           bsModal("popOutlierRemoval0", "Outlier Removal", "goOutlierRemoval0", size = "large",uiOutput("uiOutlierRemoval0"))
+                    )
+                  ),
+                  box(
+                    width = 4,
+                    # height = "200px",
+                    title = "Data Normalization",
+                    align = 'right',
+                    actionButton('goNormalizing0', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                  ),
+                  box(
+                    width = 12,
+                    title = "Conditions",
+                    fluidRow(
+                      column(3,selectInput('variableCon0', 'If', choices = c('Please Merge for options'), multiple = F)),
+                      conditionalPanel(
+                        "output.condCheck01",
+                        column(1,selectInput('equalCon01', '.', choices = c('==','>=','<=','>','<'), multiple = F)),
+                        column(2,numericInput('numberCon0', label='.', value=0)),
+                        column(2,selectInput('actionCon01', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
+                        conditionalPanel("input.actionCon01 == 'Replace with'",
+                                         column(2, 
+                                                numericInput('replaceCon01', 
+                                                             label='.', value=0)
+                                         )
+                        ),
+                        column(2,
+                               style="padding-top:30px; font-weight: bold",
+                               textOutput('rowSelected01')
+                        ),
+                        column(12, align = 'right',
+                               actionButton('goConditions01', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                        )
+                      ),
+                      conditionalPanel(
+                        "output.condCheck02",
+                        column(2,selectInput('equalCon02', '.', choices = c('==','!='), multiple = F)),
+                        column(2,textInput('textCon0', label='.', value= '', placeholder = 'type input')),
+                        # column(2,selectInput('textCon', '.', choices = c('Please merge for options'), multiple = F)),
+                        column(2,selectInput('actionCon02', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
+                        conditionalPanel("input.actionCon02 == 'Replace with'",
+                                         column(2,
+                                                textInput('replaceCon02', label='.', value='', placeholder = 'type input')
+                                         )
+                        ),
+                        column(2,
+                               style="padding-top:30px; font-weight: bold",
+                               textOutput('rowSelected02')
+                        ),
+                        column(12, align = 'right',
+                               actionButton('goConditions02', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                        )
+                      ),
+                      conditionalPanel(
+                        "output.condCheck03",
+                        column(8, align = 'center', 
+                               bsAlert('conditionCheck03')
+                        )
                       )
                     )
                   )
                 )
-            ),
-            tabPanel(
-              "Other Options", icon = icon("tasks"),
-              fluidRow(
-                # others like normalizing etc.
-                shinyjs::inlineCSS(list(
-                  "#shiny-tab-preprocessing .goButton" = "position: absolute; right:10px; bottom: 20px"
-                )),
-                box(
-                  # status = "warning",
-                  width = 4,
-                  height = "200px",
-                  title = "Excludes",
-                  selectInput('excludingVar', 'Exclude variable(s)', choices = c('Please Merge for options'), multiple = T),
-                  column(12, align = 'right',
-                         actionButton('goExcludingVar', 'Go', class="goButton", icon = icon("arrow-circle-right")),
-                         bsModal("popExcludingVar", "Excludes", "goExcludingVar", size = "small", uiOutput("uiExcludingVar"))
+              )
+            )
+          ),
+          conditionalPanel(
+            # if two files are imported
+            'output.twoFilesCheck',
+          # tabs for pre-processing
+            tabBox( 
+              id = "preProTabs1",
+              width = 12,
+  #             tabPanel(
+  #               "Date/Time parser", icon = icon("clock-o"),
+  #               # date time buttons
+  #               fluidRow(
+  #                 # allow x-flow for DT:dataTable
+  #                 shinyjs::inlineCSS(list(
+  #                   ".dataTables_wrapper" = "overflow-x: scroll; overflow-y: hidden"
+  #                 )),
+  #                 align = 'center',
+  #                 box(
+  #                   width = 6,
+  #                   title = "Predictor's Timestamp", 
+  #                   column(4,
+  #                       selectInput('preTimeCol', 
+  #                                   'Chose Column with timestamp:', 
+  #                                   choices = c('column'), 
+  #                                   multiple = F
+  #                       )
+  #                   ),
+  #                   column(8,
+  #                          uiOutput("predictor1Table")
+  #                          ),
+  #                   column(12,
+  #                          align = 'left',
+  #                          h5(strong('Timestamp Preview: ')),
+  #                          box(
+  #                            width = 12,
+  #                            align = 'center',
+  #                            h4(uiOutput('preTimestamp'))
+  #                          )
+  #                   ),
+  #                   column(6,
+  #                         h5('If integer convert to Timestamp'),
+  #                         actionButton('preTimeConvert','Convert')
+  #                   )
+  #                 ),
+  #                 box(
+  #                   width = 6,
+  #                   title = "Target's Timestamp", 
+  #                   column(4,
+  #                          selectInput('tarTimeCol', 
+  #                                      'Chose Column with timestamp:', 
+  #                                      choices = c('column'), 
+  #                                      multiple = F
+  #                          )
+  #                   ),
+  #                   column(8,
+  #                          uiOutput("target1Table")
+  #                         ),
+  #                   column(12,
+  #                          align = 'left',
+  #                          h5(strong('Timestamp Preview: ')),
+  #                          box(
+  #                            width = 12,
+  #                            align = 'center',
+  #                            h4(uiOutput('tarTimestamp'))
+  #                          )
+  #                   ),
+  #                   column(6,
+  #                          h5('If integer convert to Timestamp'),
+  #                          actionButton('preTimeConvert','Convert')
+  #                   )
+  #                 )
+  #               )
+  #             ),
+              
+              tabPanel(
+                "Merge", icon = icon("compress"),
+                fluidRow(
+                  # merge data
+                  box(width = 4, 
+                      title = '1. Select Merge Fields:',
+                      column(12,
+                             selectInput('targetField', "Target's timestamps", choices = c('Please select a field to merge upon'), multiple = F)
+                      ),   
+                      column(12,
+                             selectInput('predictorField', "Predictor's timestamps", choices = c('Please select a field to merge upon'), multiple = F)
+                      )
+                  ),
+                  box(width = 4,
+                      title = '2. Choices:',
+                      column(12,
+                             selectInput('targetOption', 'Choose your Target variable:', choices = c('Please select Target'))
+                      ),
+                      column(12,
+                             selectInput('excludingPre', 'Exclude Predictor variable(s)', choices = c('Select variable(s)'), multiple = T)
+                      )
+                  ),
+                  box(width = 4, 
+                      title = '3. Create merged Dataset:',
+                      actionButton('merge', 'Merge', class="goButton", icon = icon("arrow-circle-right"))
+                      # bsModal("popMerge", "Merging Choices", "merge", size = "large", uiOutput("uiMerging"))
                   )
-                ),
-                box(
-                  width = 4,
-                  height = "200px",
-                  title = "Outlier Removal",
-                  selectInput('outlierRemoval', 'Select a variable', choices = c('Please Merge for options'), multiple = F),
-                  column(12, align ='right',
-                         actionButton('goOutlierRemoval', 'Go', class="goButton", icon = icon("arrow-circle-right")),
-                         bsModal("popOutlierRemoval", "Outlier Removal", "goOutlierRemoval", size = "large",uiOutput("uiOutlierRemoval"))
-                         )
-                ),
-                box(
-                  width = 4,
-                  # height = "200px",
-                  title = "Data Normalization",
-                  align = 'right',
-                  actionButton('goNormalizing', 'Go', class="goButton", icon = icon("arrow-circle-right"))
-                ),
-                box(
-                  width = 12,
-                  title = "Conditions",
-                  fluidRow(
-                    column(3,selectInput('variableCon', 'If', choices = c('Please Merge for options'), multiple = F)),
-                    conditionalPanel(
-                      "output.condCheck1",
-                      column(1,selectInput('equalCon1', '.', choices = c('==','>=','<=','>','<'), multiple = F)),
-                      column(2,numericInput('numberCon', label='.', value=0)),
-                      column(2,selectInput('actionCon1', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
-                      conditionalPanel("input.actionCon1 == 'Replace with'",
-                                       column(2, 
-                                              numericInput('replaceCon1', 
-                                                           label='.', value=0)
-                                       )
+                )
+              ),
+              tabPanel(
+                "Manage missing values", icon = icon("indent"),
+                fluidRow(
+                  # interopolating/reapeting
+                  box(width = 12, 
+                      conditionalPanel(
+                        'output.targetIsNull',
+                        bsAlert("noMerged")
                       ),
-                      column(2,
-                             style="padding-top:30px; font-weight: bold",
-                             textOutput('rowSelected1')
+                      conditionalPanel(
+                        'output.targetWithNoNAvalues',
+                        bsAlert("noNAs")
                       ),
-                      column(12, align = 'right',
-                             actionButton('goConditions1', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                      conditionalPanel(
+                        "output.isTargetNumeric",
+                        column(12,
+                               column(4,
+                                      selectizeInput(
+                                        'theNApolicy', 
+                                        "Select NA's Policy (numerical Target)",
+                                        choices = c('Interpolation', 'Repeating'),
+                                        multiple = F
+                                      )
+                               ),
+                               conditionalPanel(
+                                 'input.theNApolicy == "Interpolation"',
+                                 column(4,
+                                        radioButtons('interpolationMethod', 'Select an interpolation Method',
+                                                     c(Linear ='linear',
+                                                       Spline = 'spline',
+                                                       Stineman = 'stine' ),                                                  
+                                                     selected = 'linear',
+                                                     inline = F)
+                                        ),
+                                  column(12,
+                                        offset = 10,
+                                        actionButton('interpolate',
+                                                     'Interpolate')
+                                  )
+                               ),
+                               conditionalPanel(
+                                 'input.theNApolicy == "Repeating"',
+                                 column(12, offset = 10,
+                                        actionButton('repeating1', 'Repeat')
+                                 )
+                                )
+                               )
+                         ),
+                      conditionalPanel(
+                        "output.isTargetNonNumeric",
+                        column(12, 
+                               align = 'center',
+                               bsAlert('targetIsNonNumeric'),
+                               actionButton('repeating2', 'Repeat')
+                        )
                       )
-                    ),
-                    conditionalPanel(
-                      "output.condCheck2",
-                      column(2,selectInput('equalCon2', '.', choices = c('==','!='), multiple = F)),
-                      column(2,textInput('textCon', label='.', value= '', placeholder = 'type input')),
-                      # column(2,selectInput('textCon', '.', choices = c('Please merge for options'), multiple = F)),
-                      column(2,selectInput('actionCon2', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
-                      conditionalPanel("input.actionCon2 == 'Replace with'",
-                                       column(2,
-                                              textInput('replaceCon2', label='.', value='', placeholder = 'type input')
-                                       )
+                    )
+                  )
+              ),
+              tabPanel(
+                "Other Options", icon = icon("tasks"),
+                fluidRow(
+                  # others like normalizing etc.
+                  shinyjs::inlineCSS(list(
+                    "#shiny-tab-preprocessing .goButton" = "position: absolute; right:10px; bottom: 20px"
+                  )),
+                  box(
+                    # status = "warning",
+                    width = 4,
+                    height = "200px",
+                    title = "Excludes",
+                    selectInput('excludingVar', 'Exclude variable(s)', choices = c('Please Merge for options'), multiple = T),
+                    column(12, align = 'right',
+                           actionButton('goExcludingVar', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                           bsModal("popExcludingVar", "Excludes", "goExcludingVar", size = "small", uiOutput("uiExcludingVar"))
+                    )
+                  ),
+                  box(
+                    width = 4,
+                    height = "200px",
+                    title = "Outlier Removal",
+                    selectInput('outlierRemoval', 'Select a variable', choices = c('Please Merge for options'), multiple = F),
+                    column(12, align ='right',
+                           actionButton('goOutlierRemoval', 'Go', class="goButton", icon = icon("arrow-circle-right")),
+                           bsModal("popOutlierRemoval", "Outlier Removal", "goOutlierRemoval", size = "large",uiOutput("uiOutlierRemoval"))
+                           )
+                  ),
+                  box(
+                    width = 4,
+                    # height = "200px",
+                    title = "Data Normalization",
+                    align = 'right',
+                    actionButton('goNormalizing', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                  ),
+                  box(
+                    width = 12,
+                    title = "Conditions",
+                    fluidRow(
+                      column(3,selectInput('variableCon', 'If', choices = c('Please Merge for options'), multiple = F)),
+                      conditionalPanel(
+                        "output.condCheck1",
+                        column(1,selectInput('equalCon1', '.', choices = c('==','>=','<=','>','<'), multiple = F)),
+                        column(2,numericInput('numberCon', label='.', value=0)),
+                        column(2,selectInput('actionCon1', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
+                        conditionalPanel("input.actionCon1 == 'Replace with'",
+                                         column(2, 
+                                                numericInput('replaceCon1', 
+                                                             label='.', value=0)
+                                         )
+                        ),
+                        column(2,
+                               style="padding-top:30px; font-weight: bold",
+                               textOutput('rowSelected1')
+                        ),
+                        column(12, align = 'right',
+                               actionButton('goConditions1', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                        )
                       ),
-                      column(2,
-                             style="padding-top:30px; font-weight: bold",
-                             textOutput('rowSelected2')
+                      conditionalPanel(
+                        "output.condCheck2",
+                        column(2,selectInput('equalCon2', '.', choices = c('==','!='), multiple = F)),
+                        column(2,textInput('textCon', label='.', value= '', placeholder = 'type input')),
+                        # column(2,selectInput('textCon', '.', choices = c('Please merge for options'), multiple = F)),
+                        column(2,selectInput('actionCon2', 'Then', choices = c('Remove line','Replace with'), multiple = F)),
+                        conditionalPanel("input.actionCon2 == 'Replace with'",
+                                         column(2,
+                                                textInput('replaceCon2', label='.', value='', placeholder = 'type input')
+                                         )
+                        ),
+                        column(2,
+                               style="padding-top:30px; font-weight: bold",
+                               textOutput('rowSelected2')
+                        ),
+                        column(12, align = 'right',
+                               actionButton('goConditions2', 'Go', class="goButton", icon = icon("arrow-circle-right"))
+                        )
                       ),
-                      column(12, align = 'right',
-                             actionButton('goConditions2', 'Go', class="goButton", icon = icon("arrow-circle-right"))
-                      )
-                    ),
-                    conditionalPanel(
-                      "output.condCheck3",
-                      column(8, align = 'center', 
-                             bsAlert('conditionCheck3')
+                      conditionalPanel(
+                        "output.condCheck3",
+                        column(8, align = 'center', 
+                               bsAlert('conditionCheck3')
+                        )
                       )
                     )
                   )

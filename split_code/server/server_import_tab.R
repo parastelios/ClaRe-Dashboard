@@ -3,6 +3,161 @@
 ###########        Import Tab          ############
 ###################################################
 
+
+# info modal
+createAlert(session, 'importInfo', 
+            title = '<i class="fa fa-info-circle" aria-hidden="true"></i> Import a Single File
+            with predictors and target OR Two Seperate Files, one for Predictors, one for Target', 
+            append = F
+            # style = 'warning'
+)
+
+###################################################
+# Import a single file
+updateFileInput <- function (name = NULL){
+  output$dataImport <- renderUI({
+    
+    index <- isolate(v$dataImport) # re-render
+    result <- div()
+    
+    result <- tagAppendChild(
+      result,
+      fileInput(paste0('datafile', index), 
+                'Choose File',
+                accept=c('text/csv','text/comma-separated-values,text/plain','.csv'))
+    )
+    
+    if(!is.null(name)){
+      result <- tagAppendChild(
+        result, 
+        div(
+          class="progress progress-striped",
+          
+          div(
+            class="progress-bar",
+            style="width: 100%",
+            name, 
+            " upload complete"
+          )
+        )
+      )
+    }
+    
+    result
+    
+  })
+}
+
+updateFileInput()
+
+# using reactive to dynamically import dataset
+# data input
+dataInput <- reactive({
+  
+  # upload debug
+  if(DEBUG_UPLOAD_ON){
+    d <- data.frame(read.csv(dataFile))  
+    v$data <- d
+    return(v$data)
+  } 
+  
+  data_inFile <- input[[paste0('datafile', v$dataImport)]]
+  
+  # TICKY PART:
+  # 1. If initialized, `inFile` and `v$data` are both `NULL`
+  # 2. After each uploading, new `fileInput` is applied and
+  #    we want to keep previous updated data.
+  #    It also prevent recursive creation of new `fileInput`s.
+  
+  if (is.null(data_inFile)){
+    # return(NULL)
+    return(v$dataset)
+  }
+  
+  d <- data.frame( 
+    read.csv(
+      data_inFile$datapath, 
+      header=input$headerData, 
+      sep=input$sepData,
+      quote=input$quoteData
+    )
+  )
+  
+  # dataFinal <- d
+  v$dataset <- d
+  
+  # remove all non-numeric columns
+  # d <- d[sapply(d, is.numeric)]
+  
+  if (
+    is.null(d)
+    || ncol(d) == 0
+  ){
+    v$data <- NULL
+  }
+  else{
+    v$data <- d
+    # comment out to disable normalization by default
+    # and change ui:normailizing to FALSE
+    # normalizingData(TRUE)
+  }
+  
+  if (!is.null(v$data)){
+    v$dataImport <- v$dataImport + 1
+    updateFileInput(name = data_inFile$name)
+  }
+  
+  # return dataset for display
+  return(v$dataset)
+})
+
+
+
+# data table with navigation tab
+# renderTable will kill the browser when the data is large
+
+# dataset
+output$datasetTable <- renderUI({
+  
+  d <- dataInput()
+  
+  if (is.null(d)){
+    
+    fluidRow(box(
+      width = 12,
+      background ="green",
+      
+      tags$h4(icon('bullhorn'),"Welcome"),
+      HTML("Please upload a dataset to start.")
+      
+    ))
+  }
+  else{
+    
+    output$datasetTable0 <- DT::renderDataTable({
+      
+      DT::datatable(d, options = list(pageLength = 20))
+    })
+    
+    DT::dataTableOutput('datasetTable0')
+  }
+})
+
+# dataset summary
+output$datasetSummary <- renderPrint({
+  d <- dataInput()
+  
+  if (is.null(d))
+    return()
+  
+  summary(d)
+  
+})
+
+###################################################
+#             Import two files
+
+
 ###################################################
 #              predictor file                     #
 ###################################################

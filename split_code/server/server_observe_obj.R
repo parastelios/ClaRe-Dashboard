@@ -13,6 +13,18 @@ observe({
   ###########  date/time tab  ###########
   updateSelectInput(session, "preTimeCol", choices = d_preCol)
   updateSelectInput(session, "tarTimeCol", choices = d_tarCol)
+  ########## select target tab ##########
+  updateSelectInput(session, "targetOption0", choices = d_Col)
+  updateSelectInput(session, "excluding", choices = d_Col)
+  # updateSelectInput(session, "colWithNAvalues0", choices = v$d_colNA)
+  ########## other optopns tab0 #########
+  # updateSelectInput(session, "excludingVar", choices = d_Col)
+  # this will refresh all components
+  # let's keep outlierRemoval as previous
+  updateSelectInput(session, "excludingVar0", choices = d_Col)
+  updateSelectInput(session, "outlierRemoval0", choices =  d_Col, selected = v$todoOutlierName)
+  updateSelectInput(session, "variableCon0", choices = d_Col)
+  
   ############## merge tab ##############
   updateSelectInput(session, "predictorField", choices = d_preCol)
   updateSelectInput(session, "targetField", choices = d_tarCol)

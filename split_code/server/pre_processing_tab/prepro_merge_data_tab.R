@@ -2,6 +2,13 @@
 #                   Merge Data                    #
 ###################################################  
 
+# checking if two files are imported
+output$twoFilesCheck <- reactive({
+  twoFiles = !(is.null(v$data_pre) || is.null(v$data_tar)) & is.null(v$data)
+  return(twoFiles)
+})
+outputOptions(output, 'twoFilesCheck', suspendWhenHidden = FALSE)
+
 # Event of clicking on merge button
 observeEvent(input$confirmMerging, {
   predField = input$predictorField
