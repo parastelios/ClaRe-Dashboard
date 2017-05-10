@@ -27,10 +27,6 @@ dataFile = './data_arcodium/runPreTarSub1.csv'
 # targetFile = './data_arcodium/runTar_sub1.csv'
 # targetFile = './data_arcodium/snowTarget.csv'
 
-# Load merged file by dir
-# LOAD_MERGED = F
-# mergedFile = './mergedFile.csv'
-
 # Save model option by run
 SAVE_MODEL = T
 
