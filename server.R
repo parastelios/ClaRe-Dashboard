@@ -22,9 +22,9 @@ options(shiny.maxRequestSize = 1000*1024^2)
 # global settings
 DEBUG_UPLOAD_ON  = F
 dataFile = './data_arcodium/runPreTarSub1.csv'
-predictorFile = './data_arcodium/runPre_sub1.csv'
+# predictorFile = './data_arcodium/runPre_sub1.csv'
 # predictorFile = './data_arcodium/snowPredictors.csv'
-targetFile = './data_arcodium/runTar_sub1.csv'
+# targetFile = './data_arcodium/runTar_sub1.csv'
 # targetFile = './data_arcodium/snowTarget.csv'
 
 # Load merged file by dir
@@ -55,9 +55,11 @@ shinyServer(function(input, output, session) {
   source(file.path("split_code", "server", "pre_processing_tab","prepro_select_Target_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","prepro_merge_data_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","prepro_manage_NA_tab.R"),  local = TRUE)$v
-  source(file.path("split_code", "server", "pre_processing_tab","prepro_save_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_manage_NA_tab0.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","prepro_other_options_tab.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_other_options_tab0.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "pre_processing_tab","prepro_plot_tab1.R"),  local = TRUE)$v
+  source(file.path("split_code", "server", "pre_processing_tab","prepro_save_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "model_tab", "model_tab.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "model_tab", "model_tab_classification.R"),  local = TRUE)$v
   source(file.path("split_code", "server", "model_tab", "model_tab_regression.R"),  local = TRUE)$v

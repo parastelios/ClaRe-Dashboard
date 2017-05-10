@@ -39,6 +39,7 @@ outputOptions(output, 'isClassification2', suspendWhenHidden = FALSE)
 # regression
 observeEvent(input$goReg,{
   # build regression model
+  # TODO: if features empty print message
   colnames(v$features)[2] <- "target"
   model <- lm(target ~ ., data=v$features[,-1])
   v$model <- model
@@ -57,35 +58,35 @@ observeEvent(input$goReg,{
   colnames(predTable)[2] <- v$selectedTarget
   colnames(predTable)[3] <- paste0('predicted_', v$selectedTarget)
   
-  # mergedData with predicted target
-  v$dataWithPrediction <- merge(v$mergedData, predTable[,c(1,3)], by.x = colnames(v$mergedData)[1],
-                              by.y = colnames(predTable)[1], all = TRUE)
-  
-  renderMergedDataWithPred <- function(data) {
-    output$mergedDataWithPred <- renderUI({
-      
-      if (is.null(v$dataWithPrediction)){
-        fluidRow(box(
-          width = 12,
-          background ="red",
-          tags$h4(icon('bullhorn'),"Merged Data NULL!")
-          #HTML("Please upload a dataset to start.")
-        ))
-      }
-      else{
-        output$mergedDataWithPred0 <- DT::renderDataTable({
-          DT::datatable(v$dataWithPrediction, options = list(pageLength = 20))
-        })
-        DT::dataTableOutput('mergedDataWithPred0')
-      }
-    })
-    
-    output$mergedDataWithPredSummary <- renderPrint({
-      if (is.null(v$dataWithPrediction))
-        return()
-      summary(v$dataWithPrediction)
-    })
-  }
+  # # Data with predicted target
+  # v$dataWithPrediction <- merge(v$mergedData, predTable[,c(1,3)], by.x = colnames(v$mergedData)[1],
+  #                             by.y = colnames(predTable)[1], all = TRUE)
+  # 
+  # renderMergedDataWithPred <- function(data) {
+  #   output$mergedDataWithPred <- renderUI({
+  #     
+  #     if (is.null(v$dataWithPrediction)){
+  #       fluidRow(box(
+  #         width = 12,
+  #         background ="red",
+  #         tags$h4(icon('bullhorn'),"Merged Data NULL!")
+  #         #HTML("Please upload a dataset to start.")
+  #       ))
+  #     }
+  #     else{
+  #       output$mergedDataWithPred0 <- DT::renderDataTable({
+  #         DT::datatable(v$dataWithPrediction, options = list(pageLength = 20))
+  #       })
+  #       DT::dataTableOutput('mergedDataWithPred0')
+  #     }
+  #   })
+  #   
+  #   output$mergedDataWithPredSummary <- renderPrint({
+  #     if (is.null(v$dataWithPrediction))
+  #       return()
+  #     summary(v$dataWithPrediction)
+  #   })
+  # }
   
   # plot predicted vs real target with dygraphs
   output$targetTargetPlot <- renderDygraph({
@@ -149,35 +150,35 @@ observeEvent(input$goClass,{
   colnames(predTable)[2] <- v$selectedTarget
   colnames(predTable)[3] <- paste0('predicted_', v$selectedTarget)
   
-  # mergedData with predicted target
-  v$dataWithPrediction <- merge(v$mergedData, predTable[,c(1,3)], by.x = colnames(v$mergedData)[1],
-                                by.y = colnames(predTable)[1], all = TRUE)
-  
-  renderMergedDataWithPred <- function(data) {
-    output$mergedDataWithPred <- renderUI({
-      
-      if (is.null(v$dataWithPrediction)){
-        fluidRow(box(
-          width = 12,
-          background ="red",
-          tags$h4(icon('bullhorn'),"Merged Data NULL!")
-          #HTML("Please upload a dataset to start.")
-        ))
-      }
-      else{
-        output$mergedDataWithPred0 <- DT::renderDataTable({
-          DT::datatable(v$dataWithPrediction, options = list(pageLength = 20))
-        })
-        DT::dataTableOutput('mergedDataWithPred0')
-      }
-    })
-    
-    output$mergedDataWithPredSummary <- renderPrint({
-      if (is.null(v$dataWithPrediction))
-        return()
-      summary(v$dataWithPrediction)
-    })
-  }
+  # # mergedData with predicted target
+  # v$dataWithPrediction <- merge(v$mergedData, predTable[,c(1,3)], by.x = colnames(v$mergedData)[1],
+  #                               by.y = colnames(predTable)[1], all = TRUE)
+  # 
+  # renderMergedDataWithPred <- function(data) {
+  #   output$mergedDataWithPred <- renderUI({
+  #     
+  #     if (is.null(v$dataWithPrediction)){
+  #       fluidRow(box(
+  #         width = 12,
+  #         background ="red",
+  #         tags$h4(icon('bullhorn'),"Merged Data NULL!")
+  #         #HTML("Please upload a dataset to start.")
+  #       ))
+  #     }
+  #     else{
+  #       output$mergedDataWithPred0 <- DT::renderDataTable({
+  #         DT::datatable(v$dataWithPrediction, options = list(pageLength = 20))
+  #       })
+  #       DT::dataTableOutput('mergedDataWithPred0')
+  #     }
+  #   })
+  #   
+  #   output$mergedDataWithPredSummary <- renderPrint({
+  #     if (is.null(v$dataWithPrediction))
+  #       return()
+  #     summary(v$dataWithPrediction)
+  #   })
+  # }
   
   # plot decision tree
   # TODO: make it look nicer

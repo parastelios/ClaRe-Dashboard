@@ -57,8 +57,8 @@ dataInput <- reactive({
   # upload debug
   if(DEBUG_UPLOAD_ON){
     d <- data.frame(read.csv(dataFile))  
-    v$data <- d
-    return(v$data)
+    v$singleData <- d
+    return(v$singleData)
   } 
   
   data_inFile <- input[[paste0('datafile', v$dataImport)]]
@@ -93,16 +93,16 @@ dataInput <- reactive({
     is.null(d)
     || ncol(d) == 0
   ){
-    v$data <- NULL
+    v$singleData <- NULL
   }
   else{
-    v$data <- d
+    v$singleData <- d
     # comment out to disable normalization by default
     # and change ui:normailizing to FALSE
     # normalizingData(TRUE)
   }
   
-  if (!is.null(v$data)){
+  if (!is.null(v$singleData)){
     v$dataImport <- v$dataImport + 1
     updateFileInput(name = data_inFile$name)
   }

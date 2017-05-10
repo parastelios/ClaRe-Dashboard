@@ -6,6 +6,7 @@ observe({
   
   d_preCol <- colnames(v$data_pre)
   d_tarCol <- colnames(v$data_tar)
+  singleData_Col <- colnames(v$singleData)
   d_Col <- colnames(v$data)
   target <- tail(colnames(v$data),1)
   
@@ -14,35 +15,31 @@ observe({
   updateSelectInput(session, "preTimeCol", choices = d_preCol)
   updateSelectInput(session, "tarTimeCol", choices = d_tarCol)
   ########## select target tab ##########
-  updateSelectInput(session, "targetOption0", choices = d_Col)
-  updateSelectInput(session, "excluding", choices = d_Col)
+  updateSelectInput(session, "targetOption0", choices = singleData_Col)
+  updateSelectInput(session, "excluding", choices = singleData_Col)
   # updateSelectInput(session, "colWithNAvalues0", choices = v$d_colNA)
-  ########## other optopns tab0 #########
-  # updateSelectInput(session, "excludingVar", choices = d_Col)
-  # this will refresh all components
-  # let's keep outlierRemoval as previous
-  updateSelectInput(session, "excludingVar0", choices = d_Col)
-  updateSelectInput(session, "outlierRemoval0", choices =  d_Col, selected = v$todoOutlierName)
-  updateSelectInput(session, "variableCon0", choices = d_Col)
-  
   ############## merge tab ##############
   updateSelectInput(session, "predictorField", choices = d_preCol)
   updateSelectInput(session, "targetField", choices = d_tarCol)
   updateSelectInput(session, "targetOption", choices = d_tarCol)
   updateSelectInput(session, "excludingPre", choices = d_preCol)
   updateSelectInput(session, "colWithNAvalues", choices = v$d_colNA)
+  ########## other options tab0 #########
+  # updateSelectInput(session, "excludingVar", choices = d_Col)
+  # this will refresh all components
+  # let's keep outlierRemoval as previous
+  updateSelectInput(session, "excludingVar0", choices = d_Col)
+  updateSelectInput(session, "outlierRemoval0", choices =  d_Col, selected = v$todoOutlierName)
+  updateSelectInput(session, "variableCon0", choices = d_Col)
+  ########## other options tab #########
+  updateSelectInput(session, "excludingVar", choices = d_Col)
+  updateSelectInput(session, "outlierRemoval", choices =  d_Col, selected = v$todoOutlierName)
+  updateSelectInput(session, "variableCon", choices = d_Col)
   ############## plot tab ##############
   updateSelectInput(session, "plotY", choices = d_Col)
   updateSelectInput(session, "plotX", choices = c("DataIndex", d_Col))
   updateSelectInput(session, "plotClass", choices = levels(v$data[,target]))
-  ########## other optopns tab #########
-  # updateSelectInput(session, "excludingVar", choices = d_Col)
-  # this will refresh all components
-  # let's keep outlierRemoval as previous
-  # TODO: Click the button, put the name in storage
-  updateSelectInput(session, "excludingVar", choices = d_Col)
-  updateSelectInput(session, "outlierRemoval", choices =  d_Col, selected = v$todoOutlierName)
-  updateSelectInput(session, "variableCon", choices = d_Col)
+
   
   n_preCol <- ncol(v$data_pre)
   if(
@@ -64,42 +61,6 @@ observe({
   
 })
 
-# Conditions
-observe({
-  # get index of rows according to the conditions
-  rowSelected1 <- tryCatch({
-    aIndex1 <- do.call(input$equalCon1, list(
-      v$data[input$variableCon],
-      input$numberCon
-    )
-    )
-    paste0(sum(aIndex1)," rows selected")
-  },
-  error = function(error){
-    return('')
-  })
-  output$rowSelected1 <- renderText({
-    rowSelected1
-  })
-})
-
-observe({
-  # get index of rows according to the conditions
-  rowSelected2 <- tryCatch({
-    aIndex2 <- do.call(input$equalCon2, list(
-      v$data[input$variableCon],
-      input$textCon
-    )
-    )
-    paste0(sum(aIndex2)," rows selected")
-  },
-  error = function(error){
-    return('')
-  })
-  output$rowSelected2 <- renderText({
-    rowSelected2
-  })
-})
 
 ################ Modeling tab ##################
 observe({
