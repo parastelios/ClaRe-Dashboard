@@ -23,7 +23,46 @@ createAlert(session, 'modelEmpty',
             # style = 'warning'
 )
 
-# event of merging creates options for the models (regression/classification)
+# event of applying computes options for the models (regression/classification)
+observeEvent(input$confirmApplyin,{
+  # print(input$maxWindowClass)
+  # Calculate sampling rate of predictors
+  v$AIData <- analyseIndependentData(v$predictors)
+  v$AIData$Stable.Sampling.Rate <- "yes"
+  print(v$AIData$Sampling.Rate)
+  
+  # predictor rate
+  v$preRate <- v$AIData$Sampling.Rate
+  print(v$preRate)
+  
+  # target rate
+  tarLocalSR <- 1/diff(v$target[,input$targetField]/1000)
+  v$tarRate <- median(tarLocalSR)
+  if (v$tarRate > 1){
+    v$tarRate <- 1
+  }
+  
+  # update the regression options after apply
+  updateNumericInput(session, "tarSampleRateReg",
+                     value = v$tarRate, 
+                     min = 0, max = v$preRate, step = 0.005)  
+  v$maxWinReg <- as.integer(v$preRate*(input$numOfSamplesReg))
+  updateNumericInput(session, "maxWindowReg",
+                    value = v$maxWinReg,
+                    min = 0, max = 10*(v$maxWinReg), step = 1)
+  
+  # update the classification options after apply
+  updateNumericInput(session, "tarSampleRateClass", 
+                     # label = 'Give Target sampling rate:',
+                     value = v$tarRate, 
+                     min = 0, max = v$preRate, step = 0.005)
+  v$maxWinClass <- as.integer(v$preRate*(input$numOfSamplesClass))
+  updateNumericInput(session, "maxWindowClass",
+                    value = v$maxWinClass,
+                    min = 0, max = 10*v$maxWinClass, step = 1)
+})
+
+# event of merging computes options for the models (regression/classification)
 observeEvent(input$confirmMerging,{
   # print(input$maxWindowClass)
   # Calculate sampling rate of predictors
@@ -34,7 +73,7 @@ observeEvent(input$confirmMerging,{
   v$preRate <- v$AIData$Sampling.Rate
   
   # target rate
-    tarLocalSR <- 1/diff(v$data_tar[,input$targetField]/1000)
+  tarLocalSR <- 1/diff(v$data_tar[,input$targetField]/1000)
   v$tarRate <- median(tarLocalSR)
   if (v$tarRate > 1){
     v$tarRate <- 1
@@ -46,9 +85,8 @@ observeEvent(input$confirmMerging,{
                      min = 0, max = v$preRate, step = 0.005)  
   v$maxWinReg <- as.integer(v$preRate*(input$numOfSamplesReg))
   updateNumericInput(session, "maxWindowReg",
-                    value = v$maxWinReg,
-                    min = 0, max = 10*(v$maxWinReg), step = 1)
-  # v$PParameter <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateReg, input$maxWindowReg)
+                     value = v$maxWinReg,
+                     min = 0, max = 10*(v$maxWinReg), step = 1)
   
   # update the classification options after merge
   updateNumericInput(session, "tarSampleRateClass", 
@@ -57,9 +95,7 @@ observeEvent(input$confirmMerging,{
                      min = 0, max = v$preRate, step = 0.005)
   v$maxWinClass <- as.integer(v$preRate*(input$numOfSamplesClass))
   updateNumericInput(session, "maxWindowClass",
-                    value = v$maxWinClass,
-                    min = 0, max = 10*v$maxWinClass, step = 1)
+                     value = v$maxWinClass,
+                     min = 0, max = 10*v$maxWinClass, step = 1)
   
-  # calculate the parameters that go into Accordion
-  # v$PParameter <- parameterFinder(v$AIData$Sampling.Rate, input$tarSampleRateClass, input$maxWindowClass)
 })

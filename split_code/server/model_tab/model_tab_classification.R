@@ -52,7 +52,7 @@ output$preSampleRateClass <- renderText({
   }
 })
 
-# target sample rate is updated in merge_tab, while pressing merge button
+# target sampling rate is updated in model_tab, while pressing merge button
 
 # Adjusting max window size
 observeEvent(input$numOfSamplesClass,{
