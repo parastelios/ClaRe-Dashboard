@@ -526,7 +526,7 @@ observeEvent(input$runModel,{
   }
   
   # build the evaluation dataset
-  v$evalData <- data.frame(cbind(v$features[,1],target), stringsAsFactors = TRUE)
+  v$evalData <- data.frame(cbind(v$features[aTarIndex,1],target), stringsAsFactors = TRUE)
   
   for(k in 3:ncol(v$features)) {
   # start from col 3, because features start at this col, before them there are timestamp and DData cols
