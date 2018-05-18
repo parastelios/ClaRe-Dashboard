@@ -1,6 +1,6 @@
 # Accordion Dashboard: a Web-based Tool for Modeling Multivariate Time Series with Mixed Sampling Rates
 
-**Link :** http://fr.liacs.nl:7500/
+**Link :** https://www.youtube.com/watch?v=Vomhr9mBSBU
 
 Acordion Dashboard aims to provide toolkits to explore datasets in a visualized way, especially for multivariate time-series with mixed sampling rates. The dashboard was build with R Shiny package and it provides an experimental pipeline for time series data analysis with straightforward steps such as:
 - Data uploading, 
