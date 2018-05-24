@@ -1,8 +1,8 @@
-# Accordion Dashboard: a Web-based Tool for Modeling Multivariate Time Series with Mixed Sampling Rates
+# ClaRe Dashboard: a Web-based Tool for Classification and Regression of Multivariate Time Series Data
 
 **Link :** https://www.youtube.com/watch?v=Vomhr9mBSBU
 
-Acordion Dashboard aims to provide toolkits to explore datasets in a visualized way, especially for multivariate time-series with mixed sampling rates. The dashboard was build with R Shiny package and it provides an experimental pipeline for time series data analysis with straightforward steps such as:
+ClaRe Dashboard aims to provide toolkits to explore datasets in a visualized way, especially for multivariate time-series with mixed sampling rates. The dashboard was build with R Shiny package and it provides an experimental pipeline for time series data analysis with straightforward steps such as:
 - Data uploading, 
 - Pre-processing (merge, manage missing values, plot etc.), 
 - Modeling (regression, classification), and 
