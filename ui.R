@@ -22,7 +22,7 @@ jsCode2 <- readChar(fileName2, file.info(fileName2)$size)
 
 dashboardPage(
   skin = "blue",
-  dashboardHeader(title = "Accordion Dashboard"),
+  dashboardHeader(title = "ClaRe Dashboard"),
   dashboardSidebar(
     # change dashboard sidebar appearance
     shinyjs::inlineCSS(list(
